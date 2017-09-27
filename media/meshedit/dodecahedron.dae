@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+<asset>
+   <contributor>
+      <author>Scotty</author>
+      <authoring_tool>CMU Scotty3D (version 15-462/662)</authoring_tool>
+   </contributor>
+   <created>2017-02-26T13:40:02</created>
+   <modified>2017-02-26T13:40:02</modified>
+   <unit name="meter" meter="1"/>
+   <up_axis>Y_UP</up_axis>
+</asset>
+   <library_geometries>
+      <geometry id="M1" name="Mesh1">
+         <mesh>
+            <source id="M1-positions">
+               <float_array id="M1-positions-array" count="60">
+                  -0.598316 0.553884 0.595895
+                  -0.377788 -0.0234661 0.952717
+                  0.556385 0.553884 0.595895
+                  -0.0209656 0.910706 0.375367
+                  0.335857 -0.0234661 0.952717
+                  -0.955138 0.333356 0.0185451
+                  -0.598316 -0.600816 0.595895
+                  -0.955138 -0.380288 0.0185451
+                  -0.598316 0.553884 -0.558805
+                  -0.0209656 0.910706 -0.338277
+                  0.556385 -0.600816 0.595895
+                  -0.0209656 -0.957638 0.375367
+                  -0.598316 -0.600816 -0.558805
+                  -0.377788 -0.0234661 -0.915627
+                  0.556385 0.553884 -0.558805
+                  0.913207 0.333356 0.0185451
+                  0.913207 -0.380288 0.0185451
+                  0.335857 -0.0234661 -0.915627
+                  -0.0209656 -0.957638 -0.338277
+                  0.556385 -0.600816 -0.558805
+               </float_array>
+               <technique_common>
+                  <accessor source="#M1-positions-array" count="20" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="M1-vertices">
+               <input semantic="POSITION" source="#M1-positions"/>
+            </vertices>
+         <polylist count="12">
+            <input semantic="VERTEX" source="#M1-vertices" offset="0"/>
+            <vcount>5 5 5 5 5 5 5 5 5 5 5 5             </vcount>
+            <p>
+               1 4 2 3 0 
+               5 7 6 1 0 
+               3 9 8 5 0 
+               6 11 10 4 1 
+               8 13 12 7 5 
+               2 15 14 9 3 
+               10 16 15 2 4 
+               17 13 8 9 14 
+               18 11 6 7 12 
+               16 10 11 18 19 
+               17 14 15 16 19 
+               18 12 13 17 19 
+            </p>
+         </polylist>
+         </mesh>
+      </geometry>
+   </library_geometries>
+   <library_visual_scenes>
+      <visual_scene id="ScottyScene">
+         <node id="N1" name="Node1">
+            <instance_geometry url="#M1">
+            </instance_geometry>
+         </node>
+      </visual_scene>
+   </library_visual_scenes>
+   <scene>
+      <instance_visual_scene url="#ScottyScene"/>
+   </scene>
+</COLLADA>

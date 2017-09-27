@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+<asset>
+   <contributor>
+      <author>Scotty</author>
+      <authoring_tool>CMU Scotty3D (version 15-462/662)</authoring_tool>
+   </contributor>
+   <created>2016-09-27T11:02:57</created>
+   <modified>2016-09-27T11:02:57</modified>
+   <unit name="meter" meter="1"/>
+   <up_axis>Y_UP</up_axis>
+</asset>
+   <library_geometries>
+      <geometry id="M1" name="Mesh1">
+         <mesh>
+            <source id="M1-positions">
+               <float_array id="M1-positions-array" count="24">
+                  -2 -2 2
+                  -2 -2 -2
+                  2 -2 -2
+                  2 2 2
+                  2 2 -2
+                  -2 2 -2
+                  -2 2 2
+                  2 -2 2
+               </float_array>
+               <technique_common>
+                  <accessor source="#M1-positions-array" count="8" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="M1-vertices">
+               <input semantic="POSITION" source="#M1-positions"/>
+            </vertices>
+         <polylist count="6">
+            <input semantic="VERTEX" source="#M1-vertices" offset="0"/>
+            <vcount>4 4 4 4 4 4             </vcount>
+            <p>
+               2 7 0 1 
+               5 6 3 4 
+               1 0 6 5 
+               2 1 5 4 
+               3 7 2 4 
+               7 3 6 0 
+            </p>
+         </polylist>
+         </mesh>
+      </geometry>
+   </library_geometries>
+   <library_visual_scenes>
+      <visual_scene id="ScottyScene">
+         <node id="N1" name="Node1">
+            <instance_geometry url="#M1">
+            </instance_geometry>
+         </node>
+      </visual_scene>
+   </library_visual_scenes>
+   <scene>
+      <instance_visual_scene url="#ScottyScene"/>
+   </scene>
+</COLLADA>

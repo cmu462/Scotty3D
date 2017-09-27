@@ -1,0 +1,814 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.74.0 commit date:2015-03-31, commit time:13:39, hash:000dfc0</authoring_tool>
+    </contributor>
+    <created>2015-10-20T16:01:38</created>
+    <modified>2015-10-20T16:01:38</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_cameras>
+    <camera id="Camera-camera" name="Camera">
+      <optics>
+        <technique_common>
+          <perspective>
+            <xfov sid="xfov">49.13434</xfov>
+            <aspect_ratio>1.777778</aspect_ratio>
+            <znear sid="znear">0.1</znear>
+            <zfar sid="zfar">100</zfar>
+          </perspective>
+        </technique_common>
+      </optics>
+    </camera>
+  </library_cameras>
+  <library_lights>
+    <light id="Area-light" name="Light">
+      <technique_common>
+        <point>
+          <color sid="color">3 3 3</color>
+          <constant_attenuation>1</constant_attenuation>
+          <linear_attenuation>0</linear_attenuation>
+          <quadratic_attenuation>0.001599967</quadratic_attenuation>
+        </point>
+      </technique_common>
+      <extra>
+        <technique profile="CMU462">
+          <area>
+            <color sid="color">3 3 3</color>
+          </area>
+        </technique>
+      </extra>
+    </light>
+  </library_lights>
+  <library_images/>
+  <library_effects>
+    <effect id="ceiling-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.6 0.6 0.6 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="light-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.8 0.8 0.8 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="CMU462">
+          <emission>
+            <radiance>10 10 10</radiance>
+          </emission>
+        </technique>
+      </extra>
+    </effect>
+    <effect id="floor-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.6 0.6 0.6 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="leftWall-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.6 0.2 0.2 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="rightWall-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.2 0.2 0.6 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="backWall-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.6 0.6 0.6 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="ruby-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.64 0.64 0.64 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.25 0.25 0.25 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">50</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="CMU462">
+          <glass>
+            <reflectance>1 1 1</reflectance>
+            <transmittance>1 0.75 0.75</transmittance>
+            <roughness>0</roughness>
+            <ior>1.45</ior>
+          </glass>
+        </technique>
+      </extra>
+    </effect>
+    <effect id="sapphire-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.64 0.64 0.64 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.25 0.25 0.25 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">50</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="CMU462">
+          <glass>
+            <reflectance>1 1 1</reflectance>
+            <transmittance>0.75 0.75 1</transmittance>
+            <roughness>0</roughness>
+            <ior>1.45</ior>
+          </glass>
+        </technique>
+      </extra>
+    </effect>
+    <effect id="amethyst-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.64 0.64 0.64 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.25 0.25 0.25 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">50</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="CMU462">
+          <glass>
+            <reflectance>1 1 1</reflectance>
+            <transmittance>1 0.85 1</transmittance>
+            <roughness>0</roughness>
+            <ior>1.45</ior>
+          </glass>
+        </technique>
+      </extra>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="ceiling-material" name="ceiling">
+      <instance_effect url="#ceiling-effect"/>
+    </material>
+    <material id="light-material" name="light">
+      <instance_effect url="#light-effect"/>
+    </material>
+    <material id="floor-material" name="floor">
+      <instance_effect url="#floor-effect"/>
+    </material>
+    <material id="leftWall-material" name="leftWall">
+      <instance_effect url="#leftWall-effect"/>
+    </material>
+    <material id="rightWall-material" name="rightWall">
+      <instance_effect url="#rightWall-effect"/>
+    </material>
+    <material id="backWall-material" name="backWall">
+      <instance_effect url="#backWall-effect"/>
+    </material>
+    <material id="ruby-material" name="ruby">
+      <instance_effect url="#ruby-effect"/>
+    </material>
+    <material id="sapphire-material" name="sapphire">
+      <instance_effect url="#sapphire-effect"/>
+    </material>
+    <material id="amethyst-material" name="amethyst">
+      <instance_effect url="#amethyst-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="ceiling-mesh" name="ceiling">
+      <mesh>
+        <source id="ceiling-mesh-positions">
+          <float_array id="ceiling-mesh-positions-array" count="12">1 1.5 -1 1 1.5 1 -1 1.5 1 -1 1.5 -1</float_array>
+          <technique_common>
+            <accessor source="#ceiling-mesh-positions-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="ceiling-mesh-normals">
+          <float_array id="ceiling-mesh-normals-array" count="6">0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#ceiling-mesh-normals-array" count="2" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="ceiling-mesh-map-0">
+          <float_array id="ceiling-mesh-map-0-array" count="12">0 1 0 1 0 1 0 1 0 1 0 1</float_array>
+          <technique_common>
+            <accessor source="#ceiling-mesh-map-0-array" count="6" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="ceiling-mesh-vertices">
+          <input semantic="POSITION" source="#ceiling-mesh-positions"/>
+        </vertices>
+        <polylist material="ceiling-material" count="2">
+          <input semantic="VERTEX" source="#ceiling-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#ceiling-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#ceiling-mesh-map-0" offset="2" set="0"/>
+          <vcount>3 3 </vcount>
+          <p>0 0 0 1 0 1 2 0 2 3 1 3 0 1 4 2 1 5</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="light-mesh" name="light">
+      <mesh>
+        <source id="light-mesh-positions">
+          <float_array id="light-mesh-positions-array" count="12">0.4 1.49 -0.3 0.4 1.49 0.3 -0.4 1.49 0.3 -0.4 1.49 -0.3</float_array>
+          <technique_common>
+            <accessor source="#light-mesh-positions-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="light-mesh-normals">
+          <float_array id="light-mesh-normals-array" count="6">0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#light-mesh-normals-array" count="2" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="light-mesh-map-0">
+          <float_array id="light-mesh-map-0-array" count="12">0 1 0 1 0 1 0 1 0 1 0 1</float_array>
+          <technique_common>
+            <accessor source="#light-mesh-map-0-array" count="6" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="light-mesh-vertices">
+          <input semantic="POSITION" source="#light-mesh-positions"/>
+        </vertices>
+        <polylist material="light-material" count="2">
+          <input semantic="VERTEX" source="#light-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#light-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#light-mesh-map-0" offset="2" set="0"/>
+          <vcount>3 3 </vcount>
+          <p>0 0 0 1 0 1 2 0 2 3 1 3 0 1 4 2 1 5</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="floor-mesh" name="floor">
+      <mesh>
+        <source id="floor-mesh-positions">
+          <float_array id="floor-mesh-positions-array" count="12">1 0 -1 -1 0 -1 -1 0 1 1 0 1</float_array>
+          <technique_common>
+            <accessor source="#floor-mesh-positions-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="floor-mesh-normals">
+          <float_array id="floor-mesh-normals-array" count="6">0 1 0 0 1 0</float_array>
+          <technique_common>
+            <accessor source="#floor-mesh-normals-array" count="2" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="floor-mesh-map-0">
+          <float_array id="floor-mesh-map-0-array" count="12">0 1 0 1 0 1 0 1 0 1 0 1</float_array>
+          <technique_common>
+            <accessor source="#floor-mesh-map-0-array" count="6" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="floor-mesh-vertices">
+          <input semantic="POSITION" source="#floor-mesh-positions"/>
+        </vertices>
+        <polylist material="floor-material" count="2">
+          <input semantic="VERTEX" source="#floor-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#floor-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#floor-mesh-map-0" offset="2" set="0"/>
+          <vcount>3 3 </vcount>
+          <p>0 0 0 1 0 1 2 0 2 3 1 3 0 1 4 2 1 5</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="leftWall-mesh" name="leftWall">
+      <mesh>
+        <source id="leftWall-mesh-positions">
+          <float_array id="leftWall-mesh-positions-array" count="12">-1 1.5 -1 -1 1.5 1 -1 0 1 -1 0 -1</float_array>
+          <technique_common>
+            <accessor source="#leftWall-mesh-positions-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="leftWall-mesh-normals">
+          <float_array id="leftWall-mesh-normals-array" count="6">1 0 0 1 0 0</float_array>
+          <technique_common>
+            <accessor source="#leftWall-mesh-normals-array" count="2" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="leftWall-mesh-map-0">
+          <float_array id="leftWall-mesh-map-0-array" count="12">0 1 0 1 0 1 0 1 0 1 0 1</float_array>
+          <technique_common>
+            <accessor source="#leftWall-mesh-map-0-array" count="6" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="leftWall-mesh-vertices">
+          <input semantic="POSITION" source="#leftWall-mesh-positions"/>
+        </vertices>
+        <polylist material="leftWall-material" count="2">
+          <input semantic="VERTEX" source="#leftWall-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#leftWall-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#leftWall-mesh-map-0" offset="2" set="0"/>
+          <vcount>3 3 </vcount>
+          <p>0 0 0 1 0 1 2 0 2 3 1 3 0 1 4 2 1 5</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="rightWall-mesh" name="rightWall">
+      <mesh>
+        <source id="rightWall-mesh-positions">
+          <float_array id="rightWall-mesh-positions-array" count="12">1 1.5 1 1 1.5 -1 1 0 -1 1 0 1</float_array>
+          <technique_common>
+            <accessor source="#rightWall-mesh-positions-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="rightWall-mesh-normals">
+          <float_array id="rightWall-mesh-normals-array" count="6">-1 0 0 -1 0 0</float_array>
+          <technique_common>
+            <accessor source="#rightWall-mesh-normals-array" count="2" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="rightWall-mesh-map-0">
+          <float_array id="rightWall-mesh-map-0-array" count="12">0 1 0 1 0 1 0 1 0 1 0 1</float_array>
+          <technique_common>
+            <accessor source="#rightWall-mesh-map-0-array" count="6" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="rightWall-mesh-vertices">
+          <input semantic="POSITION" source="#rightWall-mesh-positions"/>
+        </vertices>
+        <polylist material="rightWall-material" count="2">
+          <input semantic="VERTEX" source="#rightWall-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#rightWall-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#rightWall-mesh-map-0" offset="2" set="0"/>
+          <vcount>3 3 </vcount>
+          <p>0 0 0 1 0 1 2 0 2 3 1 3 0 1 4 2 1 5</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="backWall-mesh" name="backWall">
+      <mesh>
+        <source id="backWall-mesh-positions">
+          <float_array id="backWall-mesh-positions-array" count="12">1 1.5 -1 -1 1.5 -1 -1 0 -1 1 0 -1</float_array>
+          <technique_common>
+            <accessor source="#backWall-mesh-positions-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="backWall-mesh-normals">
+          <float_array id="backWall-mesh-normals-array" count="6">0 0 1 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#backWall-mesh-normals-array" count="2" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="backWall-mesh-map-0">
+          <float_array id="backWall-mesh-map-0-array" count="12">0 1 0 1 0 1 0 1 0 1 0 1</float_array>
+          <technique_common>
+            <accessor source="#backWall-mesh-map-0-array" count="6" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="backWall-mesh-vertices">
+          <input semantic="POSITION" source="#backWall-mesh-positions"/>
+        </vertices>
+        <polylist material="backWall-material" count="2">
+          <input semantic="VERTEX" source="#backWall-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#backWall-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#backWall-mesh-map-0" offset="2" set="0"/>
+          <vcount>3 3 </vcount>
+          <p>0 0 0 1 0 1 2 0 2 3 1 3 0 1 4 2 1 5</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="Icosphere_003-mesh" name="Icosphere.003">
+      <mesh>
+        <source id="Icosphere_003-mesh-positions">
+          <float_array id="Icosphere_003-mesh-positions-array" count="126">0 0 -1 0.7236073 -0.5257253 -0.4472195 -0.276388 -0.8506492 -0.4472199 -0.8944262 0 -0.4472156 -0.276388 0.8506492 -0.4472199 0.7236073 0.5257253 -0.4472195 0.276388 -0.8506492 0.4472199 -0.7236073 -0.5257253 0.4472195 -0.7236073 0.5257253 0.4472195 0.276388 0.8506492 0.4472199 0.8944262 0 0.4472156 0 0 1 -0.1624554 -0.4999952 -0.8506544 0.4253227 -0.3090114 -0.8506542 0.2628688 -0.8090116 -0.5257377 0.8506479 0 -0.5257359 0.4253227 0.3090114 -0.8506542 -0.5257298 0 -0.8506517 -0.6881894 -0.4999969 -0.5257362 -0.1624554 0.4999952 -0.8506544 -0.6881894 0.4999969 -0.5257362 0.2628688 0.8090116 -0.5257377 0.9510579 -0.3090126 0 0.9510579 0.3090126 0 0 -1 0 0.5877856 -0.8090167 0 -0.9510579 -0.3090126 0 -0.5877856 -0.8090167 0 -0.5877856 0.8090167 0 -0.9510579 0.3090126 0 0.5877856 0.8090167 0 0 1 0 0.6881894 -0.4999969 0.5257362 -0.2628688 -0.8090116 0.5257377 -0.8506479 0 0.5257359 -0.2628688 0.8090116 0.5257377 0.6881894 0.4999969 0.5257362 0.1624554 -0.4999952 0.8506544 0.5257298 0 0.8506517 -0.4253227 -0.3090114 0.8506542 -0.4253227 0.3090114 0.8506542 0.1624554 0.4999952 0.8506544</float_array>
+          <technique_common>
+            <accessor source="#Icosphere_003-mesh-positions-array" count="42" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Icosphere_003-mesh-normals">
+          <float_array id="Icosphere_003-mesh-normals-array" count="240">0.1023809 -0.3150898 -0.9435235 0.7002239 -0.2680318 -0.6616988 -0.2680342 -0.1947365 -0.9435229 -0.2680342 0.1947365 -0.9435229 0.1023809 0.3150898 -0.9435235 0.904989 -0.2680316 -0.3303846 0.02474653 -0.9435213 -0.3303863 -0.8896972 -0.3150946 -0.3303848 -0.5746018 0.7487835 -0.3303876 0.5345759 0.7778646 -0.3303866 0.802609 -0.5831264 -0.1256273 -0.306569 -0.9435214 -0.1256288 -0.9920774 0 -0.1256284 -0.306569 0.9435214 -0.1256288 0.802609 0.5831264 -0.1256273 0.4089461 -0.6284251 0.6616986 -0.4712997 -0.5831223 0.6616986 -0.700224 0.2680318 0.6616988 0.0385304 0.7487791 0.6616989 0.7240422 0.1947361 0.6616953 -0.0385304 -0.7487791 -0.6616989 0.1875942 -0.5773453 -0.7946577 0.4712997 -0.5831224 -0.6616986 0.7002239 0.2680318 -0.6616988 0.6070605 0 -0.7946556 0.3313045 0 -0.9435238 -0.7240422 -0.1947361 -0.6616953 -0.4911193 -0.3568211 -0.7946575 -0.4089461 -0.6284251 -0.6616985 -0.4089461 0.6284251 -0.6616986 -0.4911193 0.3568211 -0.7946575 -0.7240422 0.1947361 -0.6616953 0.4712997 0.5831223 -0.6616986 0.1875942 0.5773453 -0.7946577 -0.0385304 0.748779 -0.661699 0.9920774 0 0.1256284 0.9822458 0 -0.1875985 0.904989 0.2680315 -0.3303846 0.306569 -0.9435214 0.1256288 0.3035309 -0.9341714 -0.1875975 0.5345759 -0.7778645 -0.3303866 -0.802609 -0.5831264 0.1256273 -0.7946556 -0.5773479 -0.187595 -0.5746018 -0.7487835 -0.3303876 -0.802609 0.5831264 0.1256273 -0.7946556 0.5773479 -0.187595 -0.8896972 0.3150946 -0.3303848 0.306569 0.9435214 0.1256288 0.3035309 0.9341714 -0.1875975 0.02474653 0.9435212 -0.3303863 0.5746018 -0.7487835 0.3303876 0.7946556 -0.5773479 0.1875951 0.8896972 -0.3150946 0.3303848 -0.5345759 -0.7778646 0.3303866 -0.3035309 -0.9341714 0.1875975 -0.02474653 -0.9435212 0.3303863 -0.904989 0.2680316 0.3303846 -0.9822458 0 0.1875985 -0.904989 -0.2680315 0.3303846 -0.02474653 0.9435213 0.3303863 -0.3035309 0.9341714 0.1875975 -0.5345759 0.7778645 0.3303866 0.8896972 0.3150946 0.3303848 0.7946556 0.5773479 0.187595 0.5746018 0.7487835 0.3303876 0.2680342 -0.1947365 0.9435229 0.4911193 -0.3568211 0.7946575 0.7240422 -0.1947361 0.6616953 -0.1023809 -0.3150898 0.9435235 -0.1875942 -0.5773454 0.7946576 0.0385304 -0.748779 0.661699 -0.3313045 0 0.9435238 -0.6070605 0 0.7946556 -0.7002239 -0.2680318 0.6616988 -0.1023809 0.3150898 0.9435235 -0.1875942 0.5773454 0.7946576 -0.4712997 0.5831224 0.6616986 0.2680342 0.1947365 0.9435229 0.4911193 0.3568211 0.7946575 0.4089461 0.6284251 0.6616985</float_array>
+          <technique_common>
+            <accessor source="#Icosphere_003-mesh-normals-array" count="80" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Icosphere_003-mesh-vertices">
+          <input semantic="POSITION" source="#Icosphere_003-mesh-positions"/>
+        </vertices>
+        <polylist material="ruby-material" count="80">
+          <input semantic="VERTEX" source="#Icosphere_003-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Icosphere_003-mesh-normals" offset="1"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>0 0 13 0 12 0 1 1 13 1 15 1 0 2 12 2 17 2 0 3 17 3 19 3 0 4 19 4 16 4 1 5 15 5 22 5 2 6 14 6 24 6 3 7 18 7 26 7 4 8 20 8 28 8 5 9 21 9 30 9 1 10 22 10 25 10 2 11 24 11 27 11 3 12 26 12 29 12 4 13 28 13 31 13 5 14 30 14 23 14 6 15 32 15 37 15 7 16 33 16 39 16 8 17 34 17 40 17 9 18 35 18 41 18 10 19 36 19 38 19 12 20 14 20 2 20 12 21 13 21 14 21 13 22 1 22 14 22 15 23 16 23 5 23 15 24 13 24 16 24 13 25 0 25 16 25 17 26 18 26 3 26 17 27 12 27 18 27 12 28 2 28 18 28 19 29 20 29 4 29 19 30 17 30 20 30 17 31 3 31 20 31 16 32 21 32 5 32 16 33 19 33 21 33 19 34 4 34 21 34 22 35 23 35 10 35 22 36 15 36 23 36 15 37 5 37 23 37 24 38 25 38 6 38 24 39 14 39 25 39 14 40 1 40 25 40 26 41 27 41 7 41 26 42 18 42 27 42 18 43 2 43 27 43 28 44 29 44 8 44 28 45 20 45 29 45 20 46 3 46 29 46 30 47 31 47 9 47 30 48 21 48 31 48 21 49 4 49 31 49 25 50 32 50 6 50 25 51 22 51 32 51 22 52 10 52 32 52 27 53 33 53 7 53 27 54 24 54 33 54 24 55 6 55 33 55 29 56 34 56 8 56 29 57 26 57 34 57 26 58 7 58 34 58 31 59 35 59 9 59 31 60 28 60 35 60 28 61 8 61 35 61 23 62 36 62 10 62 23 63 30 63 36 63 30 64 9 64 36 64 37 65 38 65 11 65 37 66 32 66 38 66 32 67 10 67 38 67 39 68 37 68 11 68 39 69 33 69 37 69 33 70 6 70 37 70 40 71 39 71 11 71 40 72 34 72 39 72 34 73 7 73 39 73 41 74 40 74 11 74 41 75 35 75 40 75 35 76 8 76 40 76 38 77 41 77 11 77 38 78 36 78 41 78 36 79 9 79 41 79</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="Icosphere_002-mesh" name="Icosphere.002">
+      <mesh>
+        <source id="Icosphere_002-mesh-positions">
+          <float_array id="Icosphere_002-mesh-positions-array" count="126">0 0 -1 0.7236073 -0.5257253 -0.4472195 -0.276388 -0.8506492 -0.4472199 -0.8944262 0 -0.4472156 -0.276388 0.8506492 -0.4472199 0.7236073 0.5257253 -0.4472195 0.276388 -0.8506492 0.4472199 -0.7236073 -0.5257253 0.4472195 -0.7236073 0.5257253 0.4472195 0.276388 0.8506492 0.4472199 0.8944262 0 0.4472156 0 0 1 -0.1624554 -0.4999952 -0.8506544 0.4253227 -0.3090114 -0.8506542 0.2628688 -0.8090116 -0.5257377 0.8506479 0 -0.5257359 0.4253227 0.3090114 -0.8506542 -0.5257298 0 -0.8506517 -0.6881894 -0.4999969 -0.5257362 -0.1624554 0.4999952 -0.8506544 -0.6881894 0.4999969 -0.5257362 0.2628688 0.8090116 -0.5257377 0.9510579 -0.3090126 0 0.9510579 0.3090126 0 0 -1 0 0.5877856 -0.8090167 0 -0.9510579 -0.3090126 0 -0.5877856 -0.8090167 0 -0.5877856 0.8090167 0 -0.9510579 0.3090126 0 0.5877856 0.8090167 0 0 1 0 0.6881894 -0.4999969 0.5257362 -0.2628688 -0.8090116 0.5257377 -0.8506479 0 0.5257359 -0.2628688 0.8090116 0.5257377 0.6881894 0.4999969 0.5257362 0.1624554 -0.4999952 0.8506544 0.5257298 0 0.8506517 -0.4253227 -0.3090114 0.8506542 -0.4253227 0.3090114 0.8506542 0.1624554 0.4999952 0.8506544</float_array>
+          <technique_common>
+            <accessor source="#Icosphere_002-mesh-positions-array" count="42" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Icosphere_002-mesh-normals">
+          <float_array id="Icosphere_002-mesh-normals-array" count="240">0.1023809 -0.3150898 -0.9435235 0.7002239 -0.2680318 -0.6616988 -0.2680342 -0.1947365 -0.9435229 -0.2680342 0.1947365 -0.9435229 0.1023809 0.3150898 -0.9435235 0.904989 -0.2680316 -0.3303846 0.02474653 -0.9435213 -0.3303863 -0.8896972 -0.3150946 -0.3303848 -0.5746018 0.7487835 -0.3303876 0.5345759 0.7778646 -0.3303866 0.802609 -0.5831264 -0.1256273 -0.306569 -0.9435214 -0.1256288 -0.9920774 0 -0.1256284 -0.306569 0.9435214 -0.1256288 0.802609 0.5831264 -0.1256273 0.4089461 -0.6284251 0.6616986 -0.4712997 -0.5831223 0.6616986 -0.700224 0.2680318 0.6616988 0.0385304 0.7487791 0.6616989 0.7240422 0.1947361 0.6616953 -0.0385304 -0.7487791 -0.6616989 0.1875942 -0.5773453 -0.7946577 0.4712997 -0.5831224 -0.6616986 0.7002239 0.2680318 -0.6616988 0.6070605 0 -0.7946556 0.3313045 0 -0.9435238 -0.7240422 -0.1947361 -0.6616953 -0.4911193 -0.3568211 -0.7946575 -0.4089461 -0.6284251 -0.6616985 -0.4089461 0.6284251 -0.6616986 -0.4911193 0.3568211 -0.7946575 -0.7240422 0.1947361 -0.6616953 0.4712997 0.5831223 -0.6616986 0.1875942 0.5773453 -0.7946577 -0.0385304 0.748779 -0.661699 0.9920774 0 0.1256284 0.9822458 0 -0.1875985 0.904989 0.2680315 -0.3303846 0.306569 -0.9435214 0.1256288 0.3035309 -0.9341714 -0.1875975 0.5345759 -0.7778645 -0.3303866 -0.802609 -0.5831264 0.1256273 -0.7946556 -0.5773479 -0.187595 -0.5746018 -0.7487835 -0.3303876 -0.802609 0.5831264 0.1256273 -0.7946556 0.5773479 -0.187595 -0.8896972 0.3150946 -0.3303848 0.306569 0.9435214 0.1256288 0.3035309 0.9341714 -0.1875975 0.02474653 0.9435212 -0.3303863 0.5746018 -0.7487835 0.3303876 0.7946556 -0.5773479 0.1875951 0.8896972 -0.3150946 0.3303848 -0.5345759 -0.7778646 0.3303866 -0.3035309 -0.9341714 0.1875975 -0.02474653 -0.9435212 0.3303863 -0.904989 0.2680316 0.3303846 -0.9822458 0 0.1875985 -0.904989 -0.2680315 0.3303846 -0.02474653 0.9435213 0.3303863 -0.3035309 0.9341714 0.1875975 -0.5345759 0.7778645 0.3303866 0.8896972 0.3150946 0.3303848 0.7946556 0.5773479 0.187595 0.5746018 0.7487835 0.3303876 0.2680342 -0.1947365 0.9435229 0.4911193 -0.3568211 0.7946575 0.7240422 -0.1947361 0.6616953 -0.1023809 -0.3150898 0.9435235 -0.1875942 -0.5773454 0.7946576 0.0385304 -0.748779 0.661699 -0.3313045 0 0.9435238 -0.6070605 0 0.7946556 -0.7002239 -0.2680318 0.6616988 -0.1023809 0.3150898 0.9435235 -0.1875942 0.5773454 0.7946576 -0.4712997 0.5831224 0.6616986 0.2680342 0.1947365 0.9435229 0.4911193 0.3568211 0.7946575 0.4089461 0.6284251 0.6616985</float_array>
+          <technique_common>
+            <accessor source="#Icosphere_002-mesh-normals-array" count="80" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Icosphere_002-mesh-vertices">
+          <input semantic="POSITION" source="#Icosphere_002-mesh-positions"/>
+        </vertices>
+        <polylist material="sapphire-material" count="80">
+          <input semantic="VERTEX" source="#Icosphere_002-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Icosphere_002-mesh-normals" offset="1"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>0 0 13 0 12 0 1 1 13 1 15 1 0 2 12 2 17 2 0 3 17 3 19 3 0 4 19 4 16 4 1 5 15 5 22 5 2 6 14 6 24 6 3 7 18 7 26 7 4 8 20 8 28 8 5 9 21 9 30 9 1 10 22 10 25 10 2 11 24 11 27 11 3 12 26 12 29 12 4 13 28 13 31 13 5 14 30 14 23 14 6 15 32 15 37 15 7 16 33 16 39 16 8 17 34 17 40 17 9 18 35 18 41 18 10 19 36 19 38 19 12 20 14 20 2 20 12 21 13 21 14 21 13 22 1 22 14 22 15 23 16 23 5 23 15 24 13 24 16 24 13 25 0 25 16 25 17 26 18 26 3 26 17 27 12 27 18 27 12 28 2 28 18 28 19 29 20 29 4 29 19 30 17 30 20 30 17 31 3 31 20 31 16 32 21 32 5 32 16 33 19 33 21 33 19 34 4 34 21 34 22 35 23 35 10 35 22 36 15 36 23 36 15 37 5 37 23 37 24 38 25 38 6 38 24 39 14 39 25 39 14 40 1 40 25 40 26 41 27 41 7 41 26 42 18 42 27 42 18 43 2 43 27 43 28 44 29 44 8 44 28 45 20 45 29 45 20 46 3 46 29 46 30 47 31 47 9 47 30 48 21 48 31 48 21 49 4 49 31 49 25 50 32 50 6 50 25 51 22 51 32 51 22 52 10 52 32 52 27 53 33 53 7 53 27 54 24 54 33 54 24 55 6 55 33 55 29 56 34 56 8 56 29 57 26 57 34 57 26 58 7 58 34 58 31 59 35 59 9 59 31 60 28 60 35 60 28 61 8 61 35 61 23 62 36 62 10 62 23 63 30 63 36 63 30 64 9 64 36 64 37 65 38 65 11 65 37 66 32 66 38 66 32 67 10 67 38 67 39 68 37 68 11 68 39 69 33 69 37 69 33 70 6 70 37 70 40 71 39 71 11 71 40 72 34 72 39 72 34 73 7 73 39 73 41 74 40 74 11 74 41 75 35 75 40 75 35 76 8 76 40 76 38 77 41 77 11 77 38 78 36 78 41 78 36 79 9 79 41 79</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="Icosphere_001-mesh" name="Icosphere.001">
+      <mesh>
+        <source id="Icosphere_001-mesh-positions">
+          <float_array id="Icosphere_001-mesh-positions-array" count="126">0 0 -1 0.7236073 -0.5257253 -0.4472195 -0.276388 -0.8506492 -0.4472199 -0.8944262 0 -0.4472156 -0.276388 0.8506492 -0.4472199 0.7236073 0.5257253 -0.4472195 0.276388 -0.8506492 0.4472199 -0.7236073 -0.5257253 0.4472195 -0.7236073 0.5257253 0.4472195 0.276388 0.8506492 0.4472199 0.8944262 0 0.4472156 0 0 1 -0.1624554 -0.4999952 -0.8506544 0.4253227 -0.3090114 -0.8506542 0.2628688 -0.8090116 -0.5257377 0.8506479 0 -0.5257359 0.4253227 0.3090114 -0.8506542 -0.5257298 0 -0.8506517 -0.6881894 -0.4999969 -0.5257362 -0.1624554 0.4999952 -0.8506544 -0.6881894 0.4999969 -0.5257362 0.2628688 0.8090116 -0.5257377 0.9510579 -0.3090126 0 0.9510579 0.3090126 0 0 -1 0 0.5877856 -0.8090167 0 -0.9510579 -0.3090126 0 -0.5877856 -0.8090167 0 -0.5877856 0.8090167 0 -0.9510579 0.3090126 0 0.5877856 0.8090167 0 0 1 0 0.6881894 -0.4999969 0.5257362 -0.2628688 -0.8090116 0.5257377 -0.8506479 0 0.5257359 -0.2628688 0.8090116 0.5257377 0.6881894 0.4999969 0.5257362 0.1624554 -0.4999952 0.8506544 0.5257298 0 0.8506517 -0.4253227 -0.3090114 0.8506542 -0.4253227 0.3090114 0.8506542 0.1624554 0.4999952 0.8506544</float_array>
+          <technique_common>
+            <accessor source="#Icosphere_001-mesh-positions-array" count="42" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Icosphere_001-mesh-normals">
+          <float_array id="Icosphere_001-mesh-normals-array" count="240">0.1023809 -0.3150898 -0.9435235 0.7002239 -0.2680318 -0.6616988 -0.2680342 -0.1947365 -0.9435229 -0.2680342 0.1947365 -0.9435229 0.1023809 0.3150898 -0.9435235 0.904989 -0.2680316 -0.3303846 0.02474653 -0.9435213 -0.3303863 -0.8896972 -0.3150946 -0.3303848 -0.5746018 0.7487835 -0.3303876 0.5345759 0.7778646 -0.3303866 0.802609 -0.5831264 -0.1256273 -0.306569 -0.9435214 -0.1256288 -0.9920774 0 -0.1256284 -0.306569 0.9435214 -0.1256288 0.802609 0.5831264 -0.1256273 0.4089461 -0.6284251 0.6616986 -0.4712997 -0.5831223 0.6616986 -0.700224 0.2680318 0.6616988 0.0385304 0.7487791 0.6616989 0.7240422 0.1947361 0.6616953 -0.0385304 -0.7487791 -0.6616989 0.1875942 -0.5773453 -0.7946577 0.4712997 -0.5831224 -0.6616986 0.7002239 0.2680318 -0.6616988 0.6070605 0 -0.7946556 0.3313045 0 -0.9435238 -0.7240422 -0.1947361 -0.6616953 -0.4911193 -0.3568211 -0.7946575 -0.4089461 -0.6284251 -0.6616985 -0.4089461 0.6284251 -0.6616986 -0.4911193 0.3568211 -0.7946575 -0.7240422 0.1947361 -0.6616953 0.4712997 0.5831223 -0.6616986 0.1875942 0.5773453 -0.7946577 -0.0385304 0.748779 -0.661699 0.9920774 0 0.1256284 0.9822458 0 -0.1875985 0.904989 0.2680315 -0.3303846 0.306569 -0.9435214 0.1256288 0.3035309 -0.9341714 -0.1875975 0.5345759 -0.7778645 -0.3303866 -0.802609 -0.5831264 0.1256273 -0.7946556 -0.5773479 -0.187595 -0.5746018 -0.7487835 -0.3303876 -0.802609 0.5831264 0.1256273 -0.7946556 0.5773479 -0.187595 -0.8896972 0.3150946 -0.3303848 0.306569 0.9435214 0.1256288 0.3035309 0.9341714 -0.1875975 0.02474653 0.9435212 -0.3303863 0.5746018 -0.7487835 0.3303876 0.7946556 -0.5773479 0.1875951 0.8896972 -0.3150946 0.3303848 -0.5345759 -0.7778646 0.3303866 -0.3035309 -0.9341714 0.1875975 -0.02474653 -0.9435212 0.3303863 -0.904989 0.2680316 0.3303846 -0.9822458 0 0.1875985 -0.904989 -0.2680315 0.3303846 -0.02474653 0.9435213 0.3303863 -0.3035309 0.9341714 0.1875975 -0.5345759 0.7778645 0.3303866 0.8896972 0.3150946 0.3303848 0.7946556 0.5773479 0.187595 0.5746018 0.7487835 0.3303876 0.2680342 -0.1947365 0.9435229 0.4911193 -0.3568211 0.7946575 0.7240422 -0.1947361 0.6616953 -0.1023809 -0.3150898 0.9435235 -0.1875942 -0.5773454 0.7946576 0.0385304 -0.748779 0.661699 -0.3313045 0 0.9435238 -0.6070605 0 0.7946556 -0.7002239 -0.2680318 0.6616988 -0.1023809 0.3150898 0.9435235 -0.1875942 0.5773454 0.7946576 -0.4712997 0.5831224 0.6616986 0.2680342 0.1947365 0.9435229 0.4911193 0.3568211 0.7946575 0.4089461 0.6284251 0.6616985</float_array>
+          <technique_common>
+            <accessor source="#Icosphere_001-mesh-normals-array" count="80" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Icosphere_001-mesh-vertices">
+          <input semantic="POSITION" source="#Icosphere_001-mesh-positions"/>
+        </vertices>
+        <polylist material="amethyst-material" count="80">
+          <input semantic="VERTEX" source="#Icosphere_001-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Icosphere_001-mesh-normals" offset="1"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>0 0 13 0 12 0 1 1 13 1 15 1 0 2 12 2 17 2 0 3 17 3 19 3 0 4 19 4 16 4 1 5 15 5 22 5 2 6 14 6 24 6 3 7 18 7 26 7 4 8 20 8 28 8 5 9 21 9 30 9 1 10 22 10 25 10 2 11 24 11 27 11 3 12 26 12 29 12 4 13 28 13 31 13 5 14 30 14 23 14 6 15 32 15 37 15 7 16 33 16 39 16 8 17 34 17 40 17 9 18 35 18 41 18 10 19 36 19 38 19 12 20 14 20 2 20 12 21 13 21 14 21 13 22 1 22 14 22 15 23 16 23 5 23 15 24 13 24 16 24 13 25 0 25 16 25 17 26 18 26 3 26 17 27 12 27 18 27 12 28 2 28 18 28 19 29 20 29 4 29 19 30 17 30 20 30 17 31 3 31 20 31 16 32 21 32 5 32 16 33 19 33 21 33 19 34 4 34 21 34 22 35 23 35 10 35 22 36 15 36 23 36 15 37 5 37 23 37 24 38 25 38 6 38 24 39 14 39 25 39 14 40 1 40 25 40 26 41 27 41 7 41 26 42 18 42 27 42 18 43 2 43 27 43 28 44 29 44 8 44 28 45 20 45 29 45 20 46 3 46 29 46 30 47 31 47 9 47 30 48 21 48 31 48 21 49 4 49 31 49 25 50 32 50 6 50 25 51 22 51 32 51 22 52 10 52 32 52 27 53 33 53 7 53 27 54 24 54 33 54 24 55 6 55 33 55 29 56 34 56 8 56 29 57 26 57 34 57 26 58 7 58 34 58 31 59 35 59 9 59 31 60 28 60 35 60 28 61 8 61 35 61 23 62 36 62 10 62 23 63 30 63 36 63 30 64 9 64 36 64 37 65 38 65 11 65 37 66 32 66 38 66 32 67 10 67 38 67 39 68 37 68 11 68 39 69 33 69 37 69 33 70 6 70 37 70 40 71 39 71 11 71 40 72 34 72 39 72 34 73 7 73 39 73 41 74 40 74 11 74 41 75 35 75 40 75 35 76 8 76 40 76 38 77 41 77 11 77 38 78 36 78 41 78 36 79 9 79 41 79</p>
+        </polylist>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_controllers/>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="Camera" name="Camera" type="NODE">
+        <matrix sid="transform">-1 0 0 0 0 0 1 3 0 0 0 0 0 0 1</matrix>
+        <instance_camera url="#Camera-camera"/>
+      </node>
+      <node id="Area" name="Area" type="NODE">
+        <matrix sid="transform">-0.6 -1.20797e-7 0 -2.62268e-8 9.05975e-8 -0.8 0 0.004315853 0 0 1 1.49 0 0 0 1</matrix>
+        <instance_light url="#Area-light"/>
+      </node>
+      <node id="ceiling" name="ceiling" type="NODE">
+        <matrix sid="transform">-1 2.69452e-14 1.50996e-7 -2.62268e-8 1.50996e-7 1.62921e-7 1 0 2.34488e-15 1 -1.62921e-7 0 0 0 0 1</matrix>
+        <instance_geometry url="#ceiling-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="ceiling-material" target="#ceiling-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="light" name="light" type="NODE">
+        <matrix sid="transform">-1 2.69452e-14 1.50996e-7 -2.62268e-8 1.50996e-7 1.62921e-7 1 0.004315853 2.34488e-15 1 -1.62921e-7 0 0 0 0 1</matrix>
+        <instance_geometry url="#light-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="light-material" target="#light-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="floor" name="floor" type="NODE">
+        <matrix sid="transform">-1 2.69452e-14 1.50996e-7 -2.62268e-8 1.50996e-7 1.62921e-7 1 0 2.34488e-15 1 -1.62921e-7 0 0 0 0 1</matrix>
+        <instance_geometry url="#floor-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="floor-material" target="#floor-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="leftWall" name="leftWall" type="NODE">
+        <matrix sid="transform">-1 2.69452e-14 1.50996e-7 -2.62268e-8 1.50996e-7 1.62921e-7 1 0 2.34488e-15 1 -1.62921e-7 0 0 0 0 1</matrix>
+        <instance_geometry url="#leftWall-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="leftWall-material" target="#leftWall-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="rightWall" name="rightWall" type="NODE">
+        <matrix sid="transform">-1 2.69452e-14 1.50996e-7 -2.62268e-8 1.50996e-7 1.62921e-7 1 0 2.34488e-15 1 -1.62921e-7 0 0 0 0 1</matrix>
+        <instance_geometry url="#rightWall-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="rightWall-material" target="#rightWall-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="backWall" name="backWall" type="NODE">
+        <matrix sid="transform">-1 2.69452e-14 1.50996e-7 -2.62268e-8 1.50996e-7 1.62921e-7 1 0.004315853 2.34488e-15 1 -1.62921e-7 0 0 0 0 1</matrix>
+        <instance_geometry url="#backWall-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="backWall-material" target="#backWall-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Icosphere_003" name="Icosphere_003" type="NODE">
+        <matrix sid="transform">0.2320203 0.08639611 0.07964141 0.3 -0.09258195 0.233782 -0.009644996 0 -0.08181215 -0.01953672 0.2367788 0.25 0 0 0 1</matrix>
+        <instance_geometry url="#Icosphere_003-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="ruby-material" target="#ruby-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Icosphere_002" name="Icosphere_002" type="NODE">
+        <matrix sid="transform">-0.2305691 0.06191454 -0.1028633 -0.3 -0.05890389 -0.2422119 -0.02636398 0 -0.1116526 -7.48209e-5 0.2263274 0.25 0 0 0 1</matrix>
+        <instance_geometry url="#Icosphere_002-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="sapphire-material" target="#sapphire-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Icosphere_001" name="Icosphere_001" type="NODE">
+        <matrix sid="transform">-0.2502948 -0.005823719 -0.07616255 2.33127e-8 0.004492312 -0.2498973 0.00575475 0.4 -0.08018997 0.004177954 0.2380465 0.25 0 0 0 1</matrix>
+        <instance_geometry url="#Icosphere_001-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="amethyst-material" target="#amethyst-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>
