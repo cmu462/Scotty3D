@@ -26,7 +26,7 @@ void Halfedge::getPickPoints(Vector3D& a, Vector3D& b, Vector3D& p, Vector3D& q,
   b = a + 2. * (q - a);
 }
 
-bool Edge::isBoundary() { return halfedge()->face()->isBoundary(); }
+bool Edge::isBoundary() { return halfedge()->face()->isBoundary() || halfedge()->twin()->face()->isBoundary(); }
 
 Vector3D Face::normal() const {
   Vector3D N(0., 0., 0.);

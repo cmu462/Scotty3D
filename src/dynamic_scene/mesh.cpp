@@ -107,8 +107,10 @@ void Mesh::draw_pretty() {
   check_finite_positions();
 
   vector<Vector3D> offsets;
+  vector<Vector3D> originalPositions;
 
   for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+    originalPositions.push_back(v->position);
     Vector3D offset = v->offset * v->normal();
     offsets.push_back(offset);
   }
@@ -143,7 +145,7 @@ void Mesh::draw_pretty() {
 
   i = 0;
   for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
-    v->position -= offsets[i++];
+    v->position = originalPositions[i++];
   }
 }
 
@@ -152,8 +154,10 @@ void Mesh::draw() {
   check_finite_positions();
   
   vector<Vector3D> offsets;
+  vector<Vector3D> originalPositions;
 
   for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+    originalPositions.push_back(v->position);
     Vector3D offset = v->offset * v->normal();
     offsets.push_back(offset);
   }
@@ -196,14 +200,17 @@ void Mesh::draw() {
 
   i = 0;
   for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
-    v->position -= offsets[i++];
+    v->position = originalPositions[i++];
   }
 }
 
 void Mesh::drawGhost() {
+
   vector<Vector3D> offsets;
+  vector<Vector3D> originalPositions;
 
   for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+    originalPositions.push_back(v->position);
     Vector3D offset = v->offset * v->normal();
     offsets.push_back(offset);
   }
@@ -232,7 +239,7 @@ void Mesh::drawGhost() {
 
   i = 0;
   for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
-    v->position -= offsets[i++];
+    v->position = originalPositions[i++];
   }
 }
 

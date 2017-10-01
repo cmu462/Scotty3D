@@ -11,20 +11,20 @@ Triangle::Triangle(const Mesh* mesh, size_t v1, size_t v2, size_t v3)
     : mesh(mesh), v1(v1), v2(v2), v3(v3) {}
 
 BBox Triangle::get_bbox() const {
-  // TODO:
+  // TODO (PathTracer):
   // compute the bounding box of the triangle
 
   return BBox();
 }
 
 bool Triangle::intersect(const Ray& r) const {
-  // TODO: implement ray-triangle intersection
+  // TODO (PathTracer): implement ray-triangle intersection
 
   return false;
 }
 
 bool Triangle::intersect(const Ray& r, Intersection* isect) const {
-  // TODO:
+  // TODO (PathTracer):
   // implement ray-triangle intersection. When an intersection takes
   // place, the Intersection data should be updated accordingly
 
