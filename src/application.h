@@ -54,6 +54,7 @@ struct AppConfig {
 
     pathtracer_num_threads = 1;
     pathtracer_envmap = NULL;
+    pathtracer_result_path = "";
   }
 
   size_t pathtracer_ns_aa;
@@ -64,6 +65,7 @@ struct AppConfig {
   size_t pathtracer_ns_refr;
   size_t pathtracer_num_threads;
   HDRImageBuffer* pathtracer_envmap;
+  std::string pathtracer_result_path;
 };
 
 class Application : public Renderer {
@@ -91,6 +93,8 @@ class Application : public Renderer {
 
   void writeSkeleton(const char* filename, const DynamicScene::Scene* scene);
   void loadSkeleton(const char* filename, DynamicScene::Scene* scene);
+
+  void render_scene(std::string saveFileLocation);
 
  private:
   // Mode determines which type of data is visualized/
@@ -213,6 +217,11 @@ class Application : public Renderer {
   bool leftDown;
   bool rightDown;
   bool middleDown;
+
+  // Only draw the pick buffer so often
+  // as an optimization.
+  int pickDrawCountdown = 0;
+  int pickDrawInterval = 5;
 
   // Event handling //
   void mouse_pressed(e_mouse_button b);   // Mouse pressed.

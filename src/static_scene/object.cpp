@@ -17,7 +17,17 @@ namespace StaticScene {
 Mesh::Mesh(const HalfedgeMesh& mesh, BSDF* bsdf) {
   // triangulate mesh before sending to visualization or render mode
   HalfedgeMesh _mesh(mesh);
-  _mesh.triangulate();
+
+  // Triangulate if needed
+  bool triNeeded = false;
+  for (auto f = mesh.facesBegin(); f != mesh.facesEnd(); f++) {
+    if(f->degree() != 3) {
+      triNeeded = true;
+    }
+  }
+  if(triNeeded) {
+    _mesh.triangulate();
+  }
 
   unordered_map<const Vertex*, int> vertexLabels;
   vector<const Vertex*> verts;

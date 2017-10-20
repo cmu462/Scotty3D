@@ -109,7 +109,7 @@ void Camera::compute_position() {
 }
 
 Ray Camera::generate_ray(double x, double y) const {
-  // TODO:
+  // TODO (PathTracer):
   // compute position of the input sensor sample coordinate on the
   // canonical sensor plane one unit away from the pinhole.
 

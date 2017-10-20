@@ -30,6 +30,7 @@ void usage(const char* binaryName) {
   printf("  -t  <INT>        Number of render threads\n");
   printf("  -m  <INT>        Maximum ray depth\n");
   printf("  -e  <PATH>       Path to environment map\n");
+  printf("  -w  <PATH>       Run Pathtracer without GUI, save render to PATH\n");
   printf("  -h               Print this help message\n");
   printf("\n");
 }
@@ -74,7 +75,7 @@ int main(int argc, char** argv) {
   // get the options
   AppConfig config;
   int opt;
-  while ((opt = getopt(argc, argv, "s:l:t:m:e:h")) !=
+  while ((opt = getopt(argc, argv, "s:l:t:m:e:w:h")) !=
          -1) {  // for each option...
     switch (opt) {
       case 's':
@@ -91,6 +92,11 @@ int main(int argc, char** argv) {
         break;
       case 'e':
         config.pathtracer_envmap = load_exr(optarg);
+        break;
+      case 'w':
+        if(optarg != nullptr) {
+          config.pathtracer_result_path = optarg;
+        }
         break;
       default:
         usage(argv[0]);
@@ -134,6 +140,12 @@ int main(int argc, char** argv) {
 
   // NOTE (sky): are we copying everything to dynamic scene? If so:
   // TODO (sky): check and make sure the destructor is freeing everything
+
+  // Run in terminal mode if requested
+  if(config.pathtracer_result_path != "") {
+    app.render_scene(config.pathtracer_result_path);
+    exit(EXIT_SUCCESS);
+  }
 
   // start viewer
   viewer.start();

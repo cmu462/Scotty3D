@@ -16,6 +16,8 @@
 #include "GLFW/glfw3.h"
 
 #include <sstream>
+#include <chrono>
+#include <thread>
 using namespace std;
 
 using Collada::CameraInfo;
@@ -182,9 +184,22 @@ void Application::update_style() {
 }
 
 void Application::render() {
+
+  // Update the hovered element using the pick buffer once very n iterations.
+  // We do this here rather than on mouse move, because some platforms generate
+  // an excessive number of mouse move events which incurs a performance hit.
+  if(pickDrawCountdown < 0) {
+    Vector2D p(mouseX, screenH - mouseY);
+    scene->getHoveredObject(p); 
+    pickDrawCountdown += pickDrawInterval;
+  } else {
+    pickDrawCountdown--;
+  }
+
   glClearColor(0., 0., 0., 0.);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   update_gl_camera();
+
 
   if (mode == ANIMATE_MODE && action == Action::CreateJoint) {
     Vector3D pos = getMouseProjection();
@@ -1190,6 +1205,10 @@ void Application::to_pose_action() {
 }
 
 void Application::mouse_pressed(e_mouse_button b) {
+
+  Vector2D p(mouseX, screenH - mouseY);
+  scene->getHoveredObject(p);
+
   switch (b) {
     case LEFT:
       leftDown = true;
@@ -1478,7 +1497,7 @@ void Application::mouse_moved(float x, float y) {
   Vector2D p(x, y);
   update_gl_camera();
   if (mode == MODEL_MODE) {
-    scene->getHoveredObject(p);
+    // scene->getHoveredObject(p); // Nick: This kills performance on some platforms which generate A LOT of mouse_moved events.
   } else if (mode == ANIMATE_MODE) {
     if (action == Action::Wave) {
       scene->getHoveredObject(p, true, true);
@@ -1946,6 +1965,18 @@ void Application::draw_action() {
   // glEnable(GL_DEPTH_TEST);
 
   textManager.render();
+}
+
+void Application::render_scene(std::string saveFileLocation) {
+
+  set_up_pathtracer();
+  pathtracer->start_raytracing();
+
+  while(!pathtracer->is_done()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  }
+
+  pathtracer->save_image(saveFileLocation);
 }
 
 }  // namespace CMU462

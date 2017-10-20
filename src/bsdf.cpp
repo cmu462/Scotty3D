@@ -1,8 +1,9 @@
 #include "bsdf.h"
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <utility>
+
 
 using std::min;
 using std::max;
@@ -38,6 +39,8 @@ Spectrum DiffuseBSDF::f(const Vector3D& wo, const Vector3D& wi) {
 }
 
 Spectrum DiffuseBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
+  // TODO (PathTracer):
+  // Implement DiffuseBSDF
   return Spectrum();
 }
 
@@ -50,7 +53,6 @@ Spectrum MirrorBSDF::f(const Vector3D& wo, const Vector3D& wi) {
 Spectrum MirrorBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
   // TODO (PathTracer):
   // Implement MirrorBSDF
-
   return Spectrum();
 }
 
@@ -77,7 +79,6 @@ Spectrum RefractionBSDF::sample_f(const Vector3D& wo, Vector3D* wi,
                                   float* pdf) {
   // TODO (PathTracer):
   // Implement RefractionBSDF
-
   return Spectrum();
 }
 
@@ -105,6 +106,7 @@ bool BSDF::refract(const Vector3D& wo, Vector3D* wi, float ior) {
   // Return false if refraction does not occur due to total internal reflection
   // and true otherwise. When dot(wo,n) is positive, then wo corresponds to a
   // ray entering the surface through vacuum.
+
 
   return true;
 }

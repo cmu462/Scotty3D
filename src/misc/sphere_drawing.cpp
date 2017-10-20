@@ -43,6 +43,11 @@ void draw_sphere_opengl(const Vector3D& p, double r, const Color& c) {
 }
 
 void draw_sphere_opengl(const Vector3D& p, double r) {
+
+  // Ensure we set some color
+  GLfloat grey[3] = {0.7, 0.7, 0.7};
+  glColor3fv(&grey[0]);
+
   if (glIsEnabled(GL_LIGHTING)) {
     glDisable(GL_LIGHTING);
     draw_sphere(p, r);

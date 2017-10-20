@@ -29,7 +29,6 @@ struct Intersection {
 
   BSDF* bsdf;  ///< BSDF of the surface at point of intersection
 
-  // More to follow.
 };
 
 }  // namespace StaticScene

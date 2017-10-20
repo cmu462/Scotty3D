@@ -67,7 +67,7 @@ endif(APPLE)
 set(LINUX UNIX AND NOT APPLE)
 if(LINUX)
 
-  # GCC only
+  # GCC configuration
   if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
     set(GCC_CXX_FLAGS "-std=gnu++11 -m64")
@@ -98,6 +98,24 @@ if(LINUX)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_CXX_FLAGS}")
 
+  endif()
+
+  # Clang configuration (experimental)
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  
+      set(CLANG_CXX_FLAGS "-std=c++11 -m64")
+  
+      if(BUILD_DEBUG)
+        set(CMAKE_BUILD_TYPE Debug)
+      else(BUILD_DEBUG)
+        set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -O3")
+        set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -funroll-loops")
+        set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -Wno-narrowing")
+        set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -Wno-deprecated-register")
+      endif(BUILD_DEBUG)
+  
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
+  
   endif()
 
 endif(LINUX)

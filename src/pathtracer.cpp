@@ -24,7 +24,7 @@ using std::max;
 
 namespace CMU462 {
 
-//#define ENABLE_RAY_LOGGING 1
+// #define ENABLE_RAY_LOGGING 1
 
 PathTracer::PathTracer(size_t ns_aa, size_t max_ray_depth, size_t ns_area_light,
                        size_t ns_diff, size_t ns_glsy, size_t ns_refr,
@@ -35,6 +35,7 @@ PathTracer::PathTracer(size_t ns_aa, size_t max_ray_depth, size_t ns_area_light,
   this->ns_diff = ns_diff;
   this->ns_glsy = ns_diff;
   this->ns_refr = ns_refr;
+
 
   if (envmap) {
     this->envLight = new EnvironmentLight(envmap);
@@ -390,6 +391,7 @@ void PathTracer::key_press(int key) {
   }
 }
 
+
 Spectrum PathTracer::trace_ray(const Ray &r) {
   Intersection isect;
 
@@ -400,9 +402,8 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
 #endif
 
     // TODO (PathTracer):
-    // If you have an environment map, return the Spectrum this ray
+    // (Task 7) If you have an environment map, return the Spectrum this ray
     // samples from the environment map. If you don't return black.
-
     return Spectrum(0, 0, 0);
   }
 
@@ -434,51 +435,63 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
   Vector3D w_out = w2o * (r.o - hit_p);
   w_out.normalize();
 
-  // TODO:
-  // Extend the below code to compute the direct lighting for all the lights
-  // in the scene, instead of just the dummy light we provided in part 1.
 
-  InfiniteHemisphereLight light(Spectrum(5.f, 5.f, 5.f));
-  // DirectionalLight light(Spectrum(5.f, 5.f, 5.f), Vector3D(1.0, -1.0, 0.0));
+  if (!isect.bsdf->is_delta()) {
+    Vector3D dir_to_light;
+    float dist_to_light;
+    float pr;
 
-  Vector3D dir_to_light;
-  float dist_to_light;
-  float pdf;
+    // ### Estimate direct lighting integral
+    for (SceneLight* light : scene->lights) {
 
-  // no need to take multiple samples from a directional source
-  int num_light_samples = light.is_delta_light() ? 1 : ns_area_light;
+      // no need to take multiple samples from a point/directional source
+      int num_light_samples = light->is_delta_light() ? 1 : ns_area_light;
 
-  // integrate light over the hemisphere about the normal
-  double scale = 1.0 / num_light_samples;
-  for (int i = 0; i < num_light_samples; i++) {
-    // returns a vector 'dir_to_light' that is a direction from
-    // point hit_p to the point on the light source.  It also returns
-    // the distance from point x to this point on the light source.
-    // (pdf is the probability of randomly selecting the random
-    // sample point on the light source -- more on this in part 2)
-    Spectrum light_L =
-        light.sample_L(hit_p, &dir_to_light, &dist_to_light, &pdf);
+      // integrate light over the hemisphere about the normal
+      for (int i = 0; i < num_light_samples; i++) {
 
-    // convert direction into coordinate space of the surface, where
-    // the surface normal is [0 0 1]
-    Vector3D w_in = w2o * dir_to_light;
+        // returns a vector 'dir_to_light' that is a direction from
+        // point hit_p to the point on the light source.  It also returns
+        // the distance from point x to this point on the light source.
+        // (pr is the probability of randomly selecting the random
+        // sample point on the light source -- more on this in part 2)
+        const Spectrum& light_L = light->sample_L(hit_p, &dir_to_light, &dist_to_light, &pr);
 
-    // note that computing dot(n,w_in) is simple
-    // in surface coordinates since the normal is [0 0 1]
-    double cos_theta = std::max(0.0, w_in[2]);
+        // convert direction into coordinate space of the surface, where
+        // the surface normal is [0 0 1]
+        const Vector3D& w_in = w2o * dir_to_light;
+        if (w_in.z < 0) continue;
 
-    // evaluate surface bsdf
-    Spectrum f = isect.bsdf->f(w_out, w_in);
+          // note that computing dot(n,w_in) is simple
+        // in surface coordinates since the normal is (0,0,1)
+        double cos_theta = w_in.z;
+          
+        // evaluate surface bsdf
+        const Spectrum& f = isect.bsdf->f(w_out, w_in);
 
-    // TODO (PathTracer):
-    // Construct a shadow ray and compute whether the intersected surface is
-    // in shadow and accumulate reflected radiance
+        // TODO (PathTracer):
+        // (Task 4) Construct a shadow ray and compute whether the intersected surface is
+        // in shadow. Only accumulate light if not in shadow.
+        L_out += (cos_theta / (num_light_samples * pr)) * f * light_L;
+      }
+    }
   }
 
   // TODO (PathTracer):
-  // Compute an indirect lighting estimate using pathtracing with Monte Carlo.
+  // ### (Task 5) Compute an indirect lighting estimate using pathtracing with Monte Carlo.
+
+
   // Note that Ray objects have a depth field now; you should use this to avoid
   // traveling down one path forever.
+  
+  // (1) randomly select a new ray direction (it may be
+  // reflection or transmittence ray depending on
+  // surface type -- see BSDF::sample_f()
+
+  // (2) potentially terminate path (using Russian roulette)
+
+  // (3) evaluate weighted reflectance contribution due 
+  // to light from this direction
 
   return L_out;
 }

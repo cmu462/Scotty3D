@@ -13,7 +13,7 @@ bool Sphere::test(const Ray& r, double& t1, double& t2) const {
   // Implement ray - sphere intersection test.
   // Return true if there are intersections and writing the
   // smaller of the two intersection times in t1 and the larger in t2.
-
+  
   return false;
 }
 
@@ -25,7 +25,7 @@ bool Sphere::intersect(const Ray& r) const {
   return false;
 }
 
-bool Sphere::intersect(const Ray& r, Intersection* i) const {
+bool Sphere::intersect(const Ray& r, Intersection* isect) const {
   // TODO (PathTracer):
   // Implement ray - sphere intersection.
   // Note again that you might want to use the the Sphere::test helper here.
