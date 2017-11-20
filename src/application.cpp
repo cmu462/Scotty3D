@@ -1612,7 +1612,7 @@ void Application::rasterize_video() {
     sprintf(num, "%04d", timeline.getCurrentFrame());
     string fname = videoPrefix + string(num) + string(".png");
 
-    char *colors = new char[screenW * screenH * 4];
+    unsigned char *colors = new unsigned char[screenW * screenH * 4];
 
     glReadPixels(0, 0, screenW, screenH, GL_RGBA, GL_UNSIGNED_BYTE, colors);
 
