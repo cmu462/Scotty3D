@@ -252,8 +252,11 @@ void Application::render() {
             DynamicScene::Joint *j =
                 (DynamicScene::Joint *)scene->selected.object;
             DynamicScene::Skeleton *skel = j->skeleton;
-            if (ikTargets.find(j) != ikTargets.end()) ikTargets.erase(j);
-            ikTargets.emplace(j, getMouseProjection());
+            if (ikTargets.find(j) != ikTargets.end()) {
+              ikTargets.erase(j);
+            } 
+            double dist = (j->getEndPosInWorld() - camera.position()).norm();
+            ikTargets.emplace(j, getMouseProjection(dist));
             skel->reachForTarget(ikTargets, timeline.getCurrentFrame());
             timeline.markTime(timeline.getCurrentFrame());
           }
@@ -1147,7 +1150,7 @@ void Application::cycle_edit_action() {
   updateWidgets();
 }
 
-Vector3D Application::getMouseProjection() {
+Vector3D Application::getMouseProjection(double dist) {
   // get projection matrix from OpenGL stack.
   GLdouble projection[16];
   glGetDoublev(GL_PROJECTION_MATRIX, projection);
@@ -1177,6 +1180,11 @@ Vector3D Application::getMouseProjection() {
   Vector3D ray_orig(camera.position());
 
   double t = dot(ray_orig, -ray_wor);
+  if(std::isfinite(dist)) {
+    // If a distance was given, use that instead
+    ray_wor = ray_wor.unit();
+    t = dist;
+  }
 
   Vector3D intersect = ray_orig + t * ray_wor;
 
@@ -1608,9 +1616,9 @@ void Application::rasterize_video() {
 
     glReadPixels(0, 0, screenW, screenH, GL_RGBA, GL_UNSIGNED_BYTE, colors);
 
+    // Clear transparency
     for (int i = 3; i < screenW * screenH * 4; i += 4) {
-      if (!(colors[i - 3] || colors[i - 2] || colors[i - 1] || colors[i]))
-        colors[i] = 255;
+      colors[i] = 255;
     }
 
     uint32_t *frame = (uint32_t *)colors;

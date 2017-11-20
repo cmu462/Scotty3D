@@ -276,7 +276,7 @@ class Application : public Renderer {
 
   // Intersects mouse position x, y in screen coordinates with a plane
   // going through the origin, and returns the intersecting position
-  Vector3D getMouseProjection();
+  Vector3D getMouseProjection(double dist=std::numeric_limits<double>::infinity());
 
   // File read/write --- since we don't have a proper implementation
   // of undo/redo, we give the user 10 "buffers" they can write into
