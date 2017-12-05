@@ -189,9 +189,20 @@ void Application::render() {
   // We do this here rather than on mouse move, because some platforms generate
   // an excessive number of mouse move events which incurs a performance hit.
   if(pickDrawCountdown < 0) {
-    Vector2D p(mouseX, screenH - mouseY);
-    scene->getHoveredObject(p); 
-    pickDrawCountdown += pickDrawInterval;
+    if (pickDrawFlag) {
+      Vector2D p(mouseX, screenH - mouseY);
+      if (mode == MODEL_MODE) {
+        scene->getHoveredObject(p);
+      } else if (mode == ANIMATE_MODE) {
+        if (action == Action::Wave) {
+          scene->getHoveredObject(p, true, true);
+        } else {
+          scene->getHoveredObject(p, false, true);
+        }
+      }
+      pickDrawCountdown += pickDrawInterval;
+      pickDrawFlag = false;
+    }
   } else {
     pickDrawCountdown--;
   }
@@ -1213,10 +1224,6 @@ void Application::to_pose_action() {
 }
 
 void Application::mouse_pressed(e_mouse_button b) {
-
-  Vector2D p(mouseX, screenH - mouseY);
-  scene->getHoveredObject(p);
-
   switch (b) {
     case LEFT:
       leftDown = true;
@@ -1504,15 +1511,18 @@ void Application::mouse_moved(float x, float y) {
   // Vector2D p(x * 2 / screenW - 1, y * 2 / screenH - 1);
   Vector2D p(x, y);
   update_gl_camera();
-  if (mode == MODEL_MODE) {
-    // scene->getHoveredObject(p); // Nick: This kills performance on some platforms which generate A LOT of mouse_moved events.
-  } else if (mode == ANIMATE_MODE) {
-    if (action == Action::Wave) {
-      scene->getHoveredObject(p, true, true);
-    } else {
-      scene->getHoveredObject(p, false, true);
-    }
-  }
+
+  pickDrawFlag = true;
+
+  // if (mode == MODEL_MODE) {
+  //   scene->getHoveredObject(p); // Nick: This kills performance on some platforms which generate A LOT of mouse_moved events.
+  // } else if (mode == ANIMATE_MODE) {
+  //   if (action == Action::Wave) {
+  //     scene->getHoveredObject(p, true, true);
+  //   } else {
+  //     scene->getHoveredObject(p, false, true);
+  //   }
+  // }
 }
 
 void Application::switch_modes(unsigned int key) {
