@@ -190,16 +190,7 @@ void Application::render() {
   // an excessive number of mouse move events which incurs a performance hit.
   if(pickDrawCountdown < 0) {
     if (pickDrawFlag) {
-      Vector2D p(mouseX, screenH - mouseY);
-      if (mode == MODEL_MODE) {
-        scene->getHoveredObject(p);
-      } else if (mode == ANIMATE_MODE) {
-        if (action == Action::Wave) {
-          scene->getHoveredObject(p, true, true);
-        } else {
-          scene->getHoveredObject(p, false, true);
-        }
-      }
+      updateHoveredObject();
       pickDrawCountdown += pickDrawInterval;
       pickDrawFlag = false;
     }
@@ -1224,6 +1215,7 @@ void Application::to_pose_action() {
 }
 
 void Application::mouse_pressed(e_mouse_button b) {
+  updateHoveredObject();
   switch (b) {
     case LEFT:
       leftDown = true;
@@ -1523,6 +1515,19 @@ void Application::mouse_moved(float x, float y) {
   //     scene->getHoveredObject(p, false, true);
   //   }
   // }
+}
+
+void Application::updateHoveredObject() {
+  Vector2D p(mouseX, screenH - mouseY);
+  if (mode == MODEL_MODE) {
+    scene->getHoveredObject(p);
+  } else if (mode == ANIMATE_MODE) {
+    if (action == Action::Wave) {
+      scene->getHoveredObject(p, true, true);
+    } else {
+      scene->getHoveredObject(p, false, true);
+    }
+  }
 }
 
 void Application::switch_modes(unsigned int key) {
