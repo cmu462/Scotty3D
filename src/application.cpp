@@ -1505,16 +1505,6 @@ void Application::mouse_moved(float x, float y) {
   update_gl_camera();
 
   pickDrawFlag = true;
-
-  // if (mode == MODEL_MODE) {
-  //   scene->getHoveredObject(p); // Nick: This kills performance on some platforms which generate A LOT of mouse_moved events.
-  // } else if (mode == ANIMATE_MODE) {
-  //   if (action == Action::Wave) {
-  //     scene->getHoveredObject(p, true, true);
-  //   } else {
-  //     scene->getHoveredObject(p, false, true);
-  //   }
-  // }
 }
 
 void Application::updateHoveredObject() {
