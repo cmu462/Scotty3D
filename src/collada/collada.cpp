@@ -604,6 +604,7 @@ void ColladaParser::parse_polymesh(XMLElement* xml, PolymeshInfo& polymesh) {
   polymesh.name = xml->Attribute("name");
   polymesh.type = Instance::POLYMESH;
 
+
   XMLElement* e_mesh = xml->FirstChildElement("mesh");
   if (!e_mesh) {
     stat("Error: no mesh data defined in geometry: " << polymesh.id);
@@ -680,7 +681,24 @@ void ColladaParser::parse_polymesh(XMLElement* xml, PolymeshInfo& polymesh) {
   }
 
   // polylist
-  XMLElement* e_polylist = e_mesh->FirstChildElement("polylist");
+  XMLElement* e_polylist;
+  XMLElement* e_polylistprim = e_mesh->FirstChildElement("polylist");
+  XMLElement* e_tri = e_mesh->FirstChildElement("triangles");
+
+  bool is_polylist;
+
+  // Supports both triangles and polylist as primitives
+  if (e_polylistprim) {
+    e_polylist = e_polylistprim;
+    is_polylist = true;
+  } else if (e_tri) {
+    e_polylist = e_tri;
+    is_polylist = false;
+  } else {
+    stat("Error: Mesh uses neither polylist nor triangles");
+    exit(EXIT_FAILURE);
+  }
+ 
   if (e_polylist) {
     // input arrays & array offsets
     bool has_vertex_array = false;
@@ -758,23 +776,33 @@ void ColladaParser::parse_polymesh(XMLElement* xml, PolymeshInfo& polymesh) {
     // create polygon size array and compute size of index array
     vector<size_t> sizes;
     size_t num_indices = 0;
-    XMLElement* e_vcount = e_polylist->FirstChildElement("vcount");
-    if (e_vcount) {
-      size_t size;
-      string s = e_vcount->GetText();
-      stringstream ss(s);
 
+    if (is_polylist) {
+      XMLElement* e_vcount = e_polylist->FirstChildElement("vcount");
+      if (e_vcount) {
+        size_t size;
+        string s = e_vcount->GetText();
+        stringstream ss(s);
+  
+        for (size_t i = 0; i < num_polygons; ++i) {
+          ss >> size;
+          sizes.push_back(size);
+          num_indices += size * stride;
+        }
+  
+      } else {
+        stat("Error: polygon sizes undefined in geometry: " << polymesh.id);
+        exit(EXIT_FAILURE);
+      }
+    } else {
+    // Not polylist, so must be triangles
+      size_t size = 3;
       for (size_t i = 0; i < num_polygons; ++i) {
-        ss >> size;
         sizes.push_back(size);
         num_indices += size * stride;
       }
-
-    } else {
-      stat("Error: polygon sizes undefined in geometry: " << polymesh.id);
-      exit(EXIT_FAILURE);
     }
-
+   
     // index array
     vector<size_t> indices;
     XMLElement* e_p = e_polylist->FirstChildElement("p");
