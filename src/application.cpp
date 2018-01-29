@@ -901,6 +901,7 @@ void Application::keyboard_event(int key, int event, unsigned char mods) {
             } else {
               if (action == Action::CreateJoint) {
                 scene->erase_selected_joint();
+                clickedJoint = nullptr;
               } else if (scene->selected.object != nullptr) {
                 double t = timeline.getCurrentFrame();
                 DynamicScene::Mesh *m =
