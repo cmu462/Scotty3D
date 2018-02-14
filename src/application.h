@@ -222,6 +222,7 @@ class Application : public Renderer {
   // as an optimization.
   int pickDrawCountdown = 0;
   int pickDrawInterval = 5;
+  bool pickDrawFlag = false;
 
   // Event handling //
   void mouse_pressed(e_mouse_button b);   // Mouse pressed.
@@ -236,6 +237,8 @@ class Application : public Renderer {
   void dragSelection(float x, float y, float dx, float dy,
                      const Matrix4x4& modelViewProj);
 
+  /* Update the object that is currently being hovered by the mouse */
+  void updateHoveredObject();
   /**
    * If the cursor is hovering over something, mark it as selected.
    */
