@@ -190,7 +190,7 @@ void Application::render() {
   // an excessive number of mouse move events which incurs a performance hit.
   if(pickDrawCountdown < 0) {
     Vector2D p(mouseX, screenH - mouseY);
-    scene->getHoveredObject(p); 
+    scene->getHoveredObject(p);
     pickDrawCountdown += pickDrawInterval;
   } else {
     pickDrawCountdown--;
@@ -254,7 +254,7 @@ void Application::render() {
             DynamicScene::Skeleton *skel = j->skeleton;
             if (ikTargets.find(j) != ikTargets.end()) {
               ikTargets.erase(j);
-            } 
+            }
             double dist = (j->getEndPosInWorld() - camera.position()).norm();
             ikTargets.emplace(j, getMouseProjection(dist));
             skel->reachForTarget(ikTargets, timeline.getCurrentFrame());
@@ -496,8 +496,6 @@ void Application::cursor_event(float x, float y) {
     mouse1_dragged(x, y);
   } else if (!leftDown && !middleDown && rightDown) {
     mouse2_dragged(x, y);
-  } else if (!leftDown && !middleDown && !rightDown) {
-    mouse_moved(x, y);
   }
 
   mouseX = x;
@@ -1499,23 +1497,6 @@ void Application::mouse2_dragged(float x, float y) {
   updateWidgets();
 }
 
-void Application::mouse_moved(float x, float y) {
-  y = screenH - y;  // Because up is down.
-                    // Converts x from [0, w] to [-1, 1], and similarly for y.
-  // Vector2D p(x * 2 / screenW - 1, y * 2 / screenH - 1);
-  Vector2D p(x, y);
-  update_gl_camera();
-  if (mode == MODEL_MODE) {
-    // scene->getHoveredObject(p); // Nick: This kills performance on some platforms which generate A LOT of mouse_moved events.
-  } else if (mode == ANIMATE_MODE) {
-    if (action == Action::Wave) {
-      scene->getHoveredObject(p, true, true);
-    } else {
-      scene->getHoveredObject(p, false, true);
-    }
-  }
-}
-
 void Application::switch_modes(unsigned int key) {
   switch (key) {
     case 'a':
@@ -1551,7 +1532,6 @@ void Application::to_model_mode() {
   }
 
   action = Action::Navigate;
-  mouse_moved(mouseX, mouseY);
   setGhosted(false);
 }
 

@@ -228,7 +228,6 @@ class Application : public Renderer {
   void mouse_released(e_mouse_button b);  // Mouse Released.
   void mouse1_dragged(float x, float y);  // Left Mouse Dragged.
   void mouse2_dragged(float x, float y);  // Right Mouse Dragged.
-  void mouse_moved(float x, float y);     // Mouse Moved.
 
   /**
    * If there is current selection and it's draggable, apply its drag method.
