@@ -106,7 +106,7 @@ void Joint::removeJoint(Scene* scene) {
   if (this == skeleton->root) return;
 
   for (auto childJoint : kids) {
-    childJoint->removeJoint(scene);
+    if (childJoint != this) childJoint->removeJoint(scene);
   }
 
   scene->removeObject(this);
