@@ -105,7 +105,7 @@ class SceneObject {
    * will be used by Scene::getHoveredObject to make the final determination
    * of which object (and possibly element within that object) was picked.
    */
-  virtual void draw_pick(int &pickID, bool transformed = false) = 0;
+  virtual void draw_pick(int &pickID, bool transformed = true) = 1;
 
   /** Assigns attributes of the selection based on the ID of the
    * object that was picked.  Can assume that pickID was one of
@@ -248,7 +248,7 @@ class Scene {
    * time this function is called.
    */
   void getHoveredObject(const Vector2D &p, bool getElement = true,
-                        bool transformed = false);
+                        bool transformed = true);
 
   /**
    * Returns true iff there is a hovered feature in the scene.
