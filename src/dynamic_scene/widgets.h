@@ -83,11 +83,13 @@ class XFormWidget : public SceneObject {
   // reference frame (e.g., during a drag).
   void updateGeometry();
 
+  void onMouseReleased();
+
   // Toggle object select mode
   void enterObjectMode();
   void exitObjectMode();
-  void enterJointMode(bool isRoot);
-  void exitJointMode();
+  void enterPoseMode();
+  void exitPoseMode();
   void enterTransformedMode();
   void exitTransformedMode();
 
@@ -100,8 +102,10 @@ class XFormWidget : public SceneObject {
   BBox bounds;
   Vector3D center;
 
+  bool isTransforming = false;
+
   bool objectMode;
-  bool jointMode, jointIsRoot;
+  bool poseMode;
   bool transformedMode;
 
   void directionalTransform(Vector3D& position, vector<int> transformAxes,

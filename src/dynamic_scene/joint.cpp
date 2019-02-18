@@ -37,34 +37,7 @@ Info Joint::getInfo() {
 }
 
 void Joint::drag(double x, double y, double dx, double dy,
-                 const Matrix4x4& modelViewProj) {
-  Vector4D q(position, 1.);
-
-  // Transform into clip space
-  q = modelViewProj * q;
-  double w = q.w;
-  q /= w;
-
-  // Shift by (dx, dy).
-  q.x += dx;
-  q.y += dy;
-
-  // Transform back into model space
-  q *= w;
-  q = modelViewProj.inv() * q;
-
-  Matrix4x4 T = Matrix4x4::identity();
-  for (Joint* j = this; j != nullptr; j = j->parent) {
-    T = j->getRotation() * T;
-  }
-  T = skeleton->mesh->getRotation() * T;
-  q = T.inv() * q;
-
-  if (skeleton->root == this)
-    position = q.to3D();
-  else
-    axis += q.to3D();
-}
+                 const Matrix4x4& modelViewProj) {}
 
 StaticScene::SceneObject* Joint::get_static_object() { return nullptr; }
 

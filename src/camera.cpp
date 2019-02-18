@@ -108,6 +108,17 @@ void Camera::compute_position() {
                                 // to the world space view direction
 }
 
+Matrix4x4 Camera::getTransformation() {
+  Matrix4x4 ret = Matrix4x4::identity();
+  for(int x = 0; x < 3; ++x)
+    for(int y = 0; y < 3; ++y)
+      ret(x, y) = c2w(x, y);
+
+  Matrix4x4 retmul = Matrix4x4::translation(pos);
+
+  return (retmul * ret).inv();
+}
+
 Ray Camera::generate_ray(double x, double y) const {
   // TODO (PathTracer):
   // compute position of the input sensor sample coordinate on the

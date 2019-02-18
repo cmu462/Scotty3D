@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <chrono>
+#include <algorithm>
 #include <thread>
 using namespace std;
 
@@ -82,6 +83,14 @@ void Application::init() {
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
   // glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
   glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+
+  // initialize fbos
+  glGenFramebuffers(1, &backface_fbo);
+  glGenFramebuffers(1, &frntface_fbo);
+  glGenTextures(1, &backface_color_tex);
+  glGenTextures(1, &backface_depth_tex);
+  glGenTextures(1, &frntface_color_tex);
+  glGenTextures(1, &frntface_depth_tex);
 
   // Initialize styles (colors, line widths, etc.) that will be used
   // to draw different types of mesh elements in various situations.
@@ -184,22 +193,21 @@ void Application::update_style() {
 }
 
 void Application::render() {
-
   // Update the hovered element using the pick buffer once very n iterations.
   // We do this here rather than on mouse move, because some platforms generate
   // an excessive number of mouse move events which incurs a performance hit.
   if(pickDrawCountdown < 0) {
     Vector2D p(mouseX, screenH - mouseY);
-    scene->getHoveredObject(p);
+    scene->getHoveredObject(p); 
     pickDrawCountdown += pickDrawInterval;
   } else {
     pickDrawCountdown--;
   }
 
   glClearColor(0., 0., 0., 0.);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   update_gl_camera();
-
 
   if (mode == ANIMATE_MODE && action == Action::CreateJoint) {
     Vector3D pos = getMouseProjection();
@@ -210,13 +218,43 @@ void Application::render() {
     gluSphere(q, 0.1, 25, 25);
     glPopMatrix();
     gluDeleteQuadric(q);
+
+    if(symmetryEnabled) {
+      Vector3D mpos = pos;
+      switch(symmetryAxis) {
+        case X: mpos.x *= -1; break;
+        case Y: mpos.y *= -1; break;
+        case Z: mpos.z *= -1; break;
+      }
+      
+      glPushMatrix();
+      glTranslated(mpos.x, mpos.y, mpos.z);
+      GLUquadric *q = gluNewQuadric();
+      glColor3f(0.3, 0.0, 0.0);
+      gluSphere(q, 0.1, 25, 25);
+      glPopMatrix();
+      gluDeleteQuadric(q);
+    }
   }
+
+  // Need to clear depth buffers after calling getMouseProjection
+  glBindFramebuffer(GL_FRAMEBUFFER, backface_fbo);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glBindFramebuffer(GL_FRAMEBUFFER, frntface_fbo);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  std::function<void(bool)> render_fn = [](bool b){};
 
   switch (mode) {
     case MODEL_MODE:
-      if (show_coordinates) draw_coordinates();
-      scene->render_in_opengl();
-      if (show_hud) draw_hud();
+      render_fn = [this](bool depth){
+        if (!depth && show_coordinates) draw_coordinates();
+
+        scene->render_in_opengl();
+
+        if (!depth && show_hud) draw_hud();
+      };
+
       break;
     case VISUALIZE_MODE:
       if (show_coordinates) draw_coordinates();
@@ -254,7 +292,7 @@ void Application::render() {
             DynamicScene::Skeleton *skel = j->skeleton;
             if (ikTargets.find(j) != ikTargets.end()) {
               ikTargets.erase(j);
-            }
+            } 
             double dist = (j->getEndPosInWorld() - camera.position()).norm();
             ikTargets.emplace(j, getMouseProjection(dist));
             skel->reachForTarget(ikTargets, timeline.getCurrentFrame());
@@ -262,25 +300,57 @@ void Application::render() {
           }
         }
       }
-
-      if (show_coordinates && !timeline.isCurrentlyPlaying())
-        draw_coordinates();
+      
       timeline.step();
 
-      if (!timeline.isCurrentlyPlaying()) scene->draw_spline_curves(timeline);
-      scene->render_splines_at(timeline.getCurrentFrame(),
-                               timeline.isCurrentlyPlaying(), useCapsuleRadius);
+      render_fn = [this](bool depth){
+        if (!depth && show_coordinates && !timeline.isCurrentlyPlaying())
+          draw_coordinates();
+        if (!depth && !timeline.isCurrentlyPlaying())
+          scene->draw_spline_curves(timeline);
 
+        scene->render_splines_at(timeline.getCurrentFrame(),
+                               timeline.isCurrentlyPlaying(), useCapsuleRadius, depth);
+
+        if(!depth) {
+          enter_2D_GL_draw_mode();
+          timeline.draw();
+          exit_2D_GL_draw_mode();
+        }
+      };
+      
       if (action == Action::Rasterize_Video) {
         rasterize_video();
         return;
       }
-
-      enter_2D_GL_draw_mode();
-      timeline.draw();
-      exit_2D_GL_draw_mode();
-
       break;
+  }
+
+  { // scope for using statements
+    using CMU462::DynamicScene::Mesh;
+    using CMU462::DynamicScene::RenderMask;
+
+    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    Mesh::flip_normals = true;
+    Mesh::global_render_mask = RenderMask::FACE;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, backface_fbo);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+    render_fn(true);
+
+    Mesh::flip_normals = false;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, frntface_fbo);
+    glFrontFace(GL_CCW);
+    render_fn(true);
+
+    glDisable(GL_CULL_FACE);
+    Mesh::global_render_mask = RenderMask::ALL;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    render_fn(false);
   }
 
   draw_action();
@@ -318,6 +388,52 @@ void Application::resize(size_t w, size_t h) {
   }
   timeline.resize(w, 64);
   timeline.move(0, h - 64);
+
+  auto set_params = [](bool depth) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    if(depth) {
+      glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    }
+  };
+
+  // update backface fbo texture
+  glBindFramebuffer(GL_FRAMEBUFFER, backface_fbo);
+  glBindTexture(GL_TEXTURE_2D, backface_color_tex);
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, screenW, screenH, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+  set_params(false);
+  glBindTexture(GL_TEXTURE_2D, backface_depth_tex);
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, screenW, screenH, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+  set_params(true);
+
+  glFramebufferTexture2D(
+    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, backface_color_tex, 0
+  );
+  glFramebufferTexture2D(
+    GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, backface_depth_tex, 0
+  );
+
+
+  // update frontface fbo texture
+  glBindFramebuffer(GL_FRAMEBUFFER, frntface_fbo);
+  glBindTexture(GL_TEXTURE_2D, frntface_color_tex);
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, screenW, screenH, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+  set_params(false);
+  glBindTexture(GL_TEXTURE_2D, frntface_depth_tex);
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, screenW, screenH, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+  set_params(true);
+
+  glFramebufferTexture2D(
+    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frntface_color_tex, 0
+  );
+  glFramebufferTexture2D(
+    GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, frntface_depth_tex, 0
+  );
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Application::set_projection_matrix() {
@@ -615,6 +731,18 @@ void Application::char_event(unsigned int codepoint) {
         case 'p':
         case 'P':
           to_pose_action();
+          break;
+        case 'S':
+          symmetryEnabled = !symmetryEnabled;
+          break;
+        case 'X':
+          symmetryAxis = Axis::X;
+          break;
+        case 'Y':
+          symmetryAxis = Axis::Y;
+          break;
+        case 'Z':
+          symmetryAxis = Axis::Z;
           break;
       }
       break;
@@ -1133,6 +1261,8 @@ void Application::toggle_create_joint_action() {
   if (action != Action::CreateJoint) {
     action = Action::CreateJoint;
     setGhosted(true);
+    scene->removeObject(scene->elementTransform);
+    scene->selected.object = nullptr;
   } else {
     action = Action::Object;
     setGhosted(false);
@@ -1164,6 +1294,7 @@ Vector3D Application::getMouseProjection(double dist) {
   double x = mouseX * 2 / screenW - 1;
   double y = screenH - mouseY;  // y is upside down
   y = y * 2 / screenH - 1;
+
   Vector4D ray_clip(x, y, -1.0, 1.0);
   // ray in eye coordinates
   Vector4D ray_eye = projection_matrix.inv() * ray_clip;
@@ -1171,6 +1302,21 @@ Vector3D Application::getMouseProjection(double dist) {
   // ray is into the screen and not a point.
   ray_eye.z = -1.0;
   ray_eye.w = 0.0;
+
+  GLfloat z1, z2;
+  const float zNear = camera.near_clip();
+  const float zFar = camera.far_clip();
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, frntface_fbo);
+  glReadPixels(mouseX, screenH-mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z1);
+  z1 = z1 * 2.f - 1.f;
+  z1 = 2.f * zNear * zFar / (zFar + zNear - z1 * (zFar - zNear));
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, backface_fbo);
+  glReadPixels(mouseX, screenH-mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z2);
+  z2 = z2 * 2.f - 1.f;
+  z2 = 2.f * zNear * zFar / (zFar + zNear - z2 * (zFar - zNear));
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+  bool invalid = (z1 <= zNear || z2 <= zNear || z1 >= zFar || z2 >= zFar);
 
   // ray in world coordinates
   Vector4D ray_wor4 = modelview_matrix * ray_eye;
@@ -1183,6 +1329,11 @@ Vector3D Application::getMouseProjection(double dist) {
     // If a distance was given, use that instead
     ray_wor = ray_wor.unit();
     t = dist;
+  } else if(!invalid) {
+    // The current ray  is not a unit vector - it is normalized in z
+    // so we can simply move along that (scaled) ray by the viewspace
+    // z value
+    t = z1 + (z2 - z1) / 2.f; // average of in/out depth
   }
 
   Vector3D intersect = ray_orig + t * ray_wor;
@@ -1248,6 +1399,24 @@ void Application::mouse_pressed(e_mouse_button b) {
             auto skeleton = clickedJoint->skeleton;
             auto newJoint = skeleton->createNewJoint(clickedJoint, clickPos);
             scene->addObject(newJoint);
+            
+            // If symmetry is enabled, create a mirrored joint
+            if(symmetryEnabled) {
+              auto p = clickedJoint;
+              if(p->mirror) p = p->mirror;
+              auto mPos = clickPos;
+              switch(symmetryAxis) {
+                case Axis::X: mPos.x *= -1; break;
+                case Axis::Y: mPos.y *= -1; break;
+                case Axis::Z: mPos.z *= -1; break;
+              }
+              auto joint2 = skeleton->createNewJoint(p, mPos);
+              scene->addObject(joint2);
+
+              newJoint->mirror = joint2;
+              joint2->mirror = newJoint;
+            }
+
             clickedJoint = newJoint;
           }
         } else {
@@ -1307,13 +1476,14 @@ void Application::setupElementTransformWidget() {
       } else if (action == Action::Object) {
         if (scene->selected.object != nullptr) {
           // Only enable widget when joint is not selected
-          DynamicScene::Joint *joint =
-              dynamic_cast<DynamicScene::Joint *>(scene->hovered.object);
-          if (joint == nullptr) {
+          //DynamicScene::Joint *joint =
+          //    dynamic_cast<DynamicScene::Joint *>(scene->hovered.object);
+          //if (joint == nullptr) {
             scene->elementTransform->enterObjectMode();
+            scene->elementTransform->setTranslate();
             scene->elementTransform->setTarget(scene->selected);
             scene->addObject(scene->elementTransform);
-          }
+          //}
         }
       } else if (action == Action::Pose) {
         if (scene->selected.object != nullptr) {
@@ -1325,7 +1495,7 @@ void Application::setupElementTransformWidget() {
               dynamic_cast<DynamicScene::Joint *>(scene->hovered.object);
           if (joint != nullptr) {
             bool isRoot = joint == joint->skeleton->root;
-            scene->elementTransform->enterJointMode(isRoot);
+            scene->elementTransform->enterPoseMode();
             if (isRoot)
               // Only allow root translation
               scene->elementTransform->setTranslate();
@@ -1333,7 +1503,7 @@ void Application::setupElementTransformWidget() {
               // Other joints are only allowed to be rotated
               scene->elementTransform->setRotate();
           } else {
-            scene->elementTransform->exitJointMode();
+            scene->elementTransform->exitPoseMode();
           }
         }
       }
@@ -1347,6 +1517,7 @@ void Application::mouse_released(e_mouse_button b) {
       leftDown = false;
       draggingTimeline = false;
       scene->elementTransform->updateGeometry();
+      scene->elementTransform->onMouseReleased();
       break;
     case RIGHT:
       rightDown = false;
@@ -1593,7 +1764,7 @@ void Application::rasterize_video() {
     sprintf(num, "%04d", timeline.getCurrentFrame());
     string fname = videoPrefix + string(num) + string(".png");
 
-    unsigned char *colors = new unsigned char[screenW * screenH * 4];
+    unsigned char *colors = new unsigned char[screenW * screenH * 4]; 
 
     glReadPixels(0, 0, screenW, screenH, GL_RGBA, GL_UNSIGNED_BYTE, colors);
 
@@ -1664,10 +1835,19 @@ void Application::raytrace_video() {
 }
 
 Matrix4x4 Application::get_world_to_3DH() {
-  Matrix4x4 P, M;
+  Matrix4x4 P, V, M;
   glGetDoublev(GL_PROJECTION_MATRIX, &P(0, 0));
-  glGetDoublev(GL_MODELVIEW_MATRIX, &M(0, 0));
-  return P * M;
+  auto sel = scene->selected.object;
+  if(sel) {
+    if(sel == scene->elementTransform)
+      M = scene->elementTransform->target.object->getTransformation();
+    else
+      M = sel->getTransformation();
+  }
+  else
+    M = Matrix4x4::identity();
+  V = camera.getTransformation();
+  return P * V * M;
 }
 
 void Application::dragSelection(float x, float y, float dx, float dy,
@@ -1871,17 +2051,26 @@ void Application::draw_action() {
         break;
     }
     Color integrator_color(0.7, 0.3, 0.7);
-    draw_string(x0, y + 20, integrator_string.str(), size, integrator_color);
+    draw_string(x0, y + 30, integrator_string.str(), size, integrator_color);
     stringstream timestep_string;
     timestep_string << "Timestep: " << timestep;
-    draw_string(x0, y + 40, timestep_string.str(), size, integrator_color);
+    draw_string(x0, y + 60, timestep_string.str(), size, integrator_color);
     stringstream damping_string;
     damping_string << "Damping Factor: " << damping_factor;
-    draw_string(x0, y + 60, damping_string.str(), size, integrator_color);
+    draw_string(x0, y + 90, damping_string.str(), size, integrator_color);
     stringstream lbs_string;
     lbs_string << "Linear Blend Skinning: "
                << (useCapsuleRadius ? "Threshold" : "Naive");
-    draw_string(x0, y + 80, lbs_string.str(), size, integrator_color);
+    draw_string(x0, y + 120, lbs_string.str(), size, integrator_color);
+
+    if(action == Action::CreateJoint) {
+      stringstream sym_string;
+      sym_string << "Joint Symmetry: " << (symmetryEnabled ? "Enabled" : "Disabled");
+      draw_string(x0, y + 150, sym_string.str(), size, integrator_color);
+      stringstream axis_string;
+      axis_string << "Symmetry Axis: " << ((char)symmetryAxis);
+      draw_string(x0, y + 180, axis_string.str(), size, integrator_color);
+    }
   }
 
   // // No selection --> no messages.

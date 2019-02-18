@@ -3,6 +3,7 @@
 #include "../halfEdgeMesh.h"
 #include "mesh.h"
 #include "widgets.h"
+#include "../gl_errors.h"
 #include <fstream>
 
 using std::cout;
@@ -85,7 +86,7 @@ void Scene::render_in_opengl() {
   }
 }
 
-void Scene::render_splines_at(double time, bool pretty, bool useCapsuleRadius) {
+void Scene::render_splines_at(double time, bool pretty, bool useCapsuleRadius, bool depth_only) {
   // Update splines
   for (SceneObject *obj : objects) {
     obj->position = obj->positions.evaluate(time);
@@ -99,6 +100,20 @@ void Scene::render_splines_at(double time, bool pretty, bool useCapsuleRadius) {
     if (mesh != nullptr) {
       mesh->linearBlendSkinning(useCapsuleRadius);
     }
+  }
+
+  if(depth_only) {
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    //glDisable(GL_ALPHA_TEST);
+    GLfloat white[4] = {1., 1., 1., 1.};
+    for (SceneObject *obj : objects) {
+      if(obj->isVisible)
+        (pretty) ? (obj->draw_pretty()) : (obj->draw());
+      //glLightfv(GL_LIGHT0, GL_DIFFUSE, white);
+    }
+    //glEnable(GL_ALPHA_TEST);
+    return;
   }
 
   // draw the scene twice using alpha test
@@ -141,6 +156,7 @@ void Scene::draw_spline_curves(Timeline &timeline) {
   // use round (rather than square) points
   glEnable(GL_POINT_SMOOTH);
   glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+
   for (SceneObject *obj : objects) {
     bool selected = (obj == this->selected.object);
     double alpha = selected ? 1. : .5;
@@ -149,6 +165,7 @@ void Scene::draw_spline_curves(Timeline &timeline) {
     const double maxTime = timeline.getMaxFrame();
     glLineWidth(3.);
     glColor4f(1., 1., 1., alpha);
+    glDisable(GL_BLEND);
     glBegin(GL_LINE_STRIP);
     for (double t = 0; t <= maxTime; t += 1. / nSamplesPerTick) {
       Vector3D p = spline(t);
@@ -200,16 +217,16 @@ void Scene::draw_spline_curves(Timeline &timeline) {
       } else {
         B = tmp2;
       }
-
-      glDisable(GL_BLEND);
+      
       int ticks_per_line = 20;
       float color = sqrt(((int)t % ticks_per_line) / (ticks_per_line - 1.0));
 
       glColor4f(color, color, 1.0, 1.0);
       glVertex3d(p.x, p.y, p.z);
-      glEnable(GL_BLEND);
     }
     glEnd();
+    glEnable(GL_BLEND);
+
     if (selected) {
       // draw dot for current position
       double t0 = timeline.getCurrentFrame();

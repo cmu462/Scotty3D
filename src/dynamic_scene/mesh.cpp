@@ -18,6 +18,9 @@ static const double low_threshold = .1;
 static const double mid_threshold = .2;
 static const double high_threshold = 1.0 - low_threshold;
 
+bool Mesh::flip_normals = false;
+RenderMask Mesh::global_render_mask = ALL; 
+
 Mesh::Mesh(Collada::PolymeshInfo &polyMesh, const Matrix4x4 &transform) {
   // Build halfedge mesh from polygon soup
   vector<vector<size_t>> polygons;
@@ -244,6 +247,9 @@ void Mesh::drawGhost() {
 }
 
 void Mesh::draw_faces(bool smooth) const {
+  if(!(global_render_mask & RenderMask::FACE))
+    return;
+
   GLfloat white[4] = {1., 1., 1., 1.};
   GLfloat faceColor[4] = {1., 1., 1., 1.};
   if (isGhosted) {
@@ -269,11 +275,13 @@ void Mesh::draw_faces(bool smooth) const {
 
     glBegin(GL_POLYGON);
     Vector3D normal(f->normal());
+    if(flip_normals) normal *= -1;
     if (!smooth) glNormal3dv(&normal.x);
     HalfedgeCIter h = f->halfedge();
     do {
       if (smooth) {
         Vector3D N = h->vertex()->normal();
+        if(flip_normals) N *= -1;
         glNormal3d(N.x, N.y, N.z);
       }
       glVertex3dv(&h->vertex()->position.x);
@@ -288,20 +296,25 @@ void Mesh::draw_faces(bool smooth) const {
 }
 
 void Mesh::draw_edges() const {
+  if(!(global_render_mask & RenderMask::EDGE))
+    return;
+
   // Draw seleted edge
-  if (scene->hovered.element==0) return;
-  Edge *ep = scene->hovered.element->getEdge();
-  if (ep) {
-    EdgeIter e = ep->halfedge()->edge();
+  if (scene->hovered.element != nullptr) {
+    Edge *ep = scene->hovered.element->getEdge();
+    if (ep) {
+      EdgeIter e = ep->halfedge()->edge();
 
-    DrawStyle *style = get_draw_style(elementAddress(e));
-    style->style_edge();
+      DrawStyle *style = get_draw_style(elementAddress(e));
+      style->style_edge();
 
-    glBegin(GL_LINES);
-    glVertex3dv(&e->halfedge()->vertex()->position.x);
-    glVertex3dv(&e->halfedge()->twin()->vertex()->position.x);
-    glEnd();
+      glBegin(GL_LINES);
+      glVertex3dv(&e->halfedge()->vertex()->position.x);
+      glVertex3dv(&e->halfedge()->twin()->vertex()->position.x);
+      glEnd();
+    }
   }
+  
 
   // Draw all edges
   defaultStyle->style_edge();
@@ -333,6 +346,9 @@ void Mesh::draw_feature_if_needed(Selection *s) const {
 }
 
 void Mesh::draw_vertex(const Vertex *v) const {
+  if(!(global_render_mask & RenderMask::VERTEX))
+    return;
+
   get_draw_style(v)->style_vertex();
   glBegin(GL_POINTS);
   glVertex3d(v->position.x, v->position.y, v->position.z);

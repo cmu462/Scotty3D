@@ -68,6 +68,12 @@ class Camera {
   double near_clip() const { return nClip; }
   double far_clip() const { return fClip; }
 
+  /*
+   * Returns the worldspace -> cameraspace transformation matrix
+   * (the view matrix)
+   */
+  Matrix4x4 getTransformation();
+
   /**
    * Returns a world-space ray from the camera that corresponds to a
    * ray exiting the camera that deposits light at the sensor plane

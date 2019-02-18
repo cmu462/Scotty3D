@@ -111,6 +111,9 @@ class Joint : public SceneObject {
   // Pointer to parent
   Joint* parent;
 
+  // Pointer to other joint created with joint symmetry, if symmetry is on
+  Joint* mirror = nullptr;
+
   // Radius of the capsule around the joint for skinning
   double capsuleRadius;
 

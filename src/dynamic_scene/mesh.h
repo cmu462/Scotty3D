@@ -20,6 +20,13 @@ class LBSInfo {
   double distance;
 };
 
+enum RenderMask {
+  VERTEX = 1,
+  EDGE = 2,
+  FACE = 4,
+  ALL = VERTEX | EDGE | FACE
+};
+
 class Mesh : public SceneObject {
  public:
   Mesh(Collada::PolymeshInfo &polyMesh, const Matrix4x4 &transform);
@@ -84,6 +91,15 @@ class Mesh : public SceneObject {
    */
   virtual void setSelection(int pickID, Selection &selection) override;
 
+  /** If true, then all meshes rendered will have their normals flipped.
+   * Useful for rendering backfaces.
+   */
+  static bool flip_normals;
+  /** For all meshes rendered, masks out if we want to render verts,
+   * faces, or edges (or some combination).
+   */
+  static RenderMask global_render_mask;
+
  private:
   // Helpers for draw().
   void draw_faces(bool smooth = false) const;
@@ -120,6 +136,7 @@ class Mesh : public SceneObject {
 
   // material
   BSDF *bsdf;
+
 };
 
 }  // namespace DynamicScene

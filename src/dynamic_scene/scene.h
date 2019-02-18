@@ -105,7 +105,7 @@ class SceneObject {
    * will be used by Scene::getHoveredObject to make the final determination
    * of which object (and possibly element within that object) was picked.
    */
-  virtual void draw_pick(int &pickID, bool transformed = true) = 1;
+  virtual void draw_pick(int &pickID, bool transformed = false) = 0;
 
   /** Assigns attributes of the selection based on the ID of the
    * object that was picked.  Can assume that pickID was one of
@@ -228,7 +228,7 @@ class Scene {
    * Renders the scene at the given time in OpenGL, according to the
    * splines specified in the animator.
    */
-  void render_splines_at(double time, bool pretty, bool useCapsuleRadius);
+  void render_splines_at(double time, bool pretty, bool useCapsuleRadius, bool depth_only = false);
 
   /**
    * Draws the actual curves corresponding to a spline.
@@ -248,7 +248,7 @@ class Scene {
    * time this function is called.
    */
   void getHoveredObject(const Vector2D &p, bool getElement = true,
-                        bool transformed = true);
+                        bool transformed = false);
 
   /**
    * Returns true iff there is a hovered feature in the scene.
@@ -329,7 +329,7 @@ class Scene {
    * Gets the selected object from the scene, returning nullptr if no object is
    * selected.
    */
-  SceneObject *get_selection();
+  SceneObject *get_world_to_3DH();
 };
 
 // Mapping between integer and 8-bit RGB values (used for picking)
