@@ -15,6 +15,7 @@
 
 #include "GLFW/glfw3.h"
 
+#include <functional>
 #include <sstream>
 #include <chrono>
 #include <algorithm>
