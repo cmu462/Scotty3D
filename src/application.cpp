@@ -199,7 +199,7 @@ void Application::render() {
   // an excessive number of mouse move events which incurs a performance hit.
   if(pickDrawCountdown < 0) {
     Vector2D p(mouseX, screenH - mouseY);
-    scene->getHoveredObject(p); 
+    scene->getHoveredObject(p);
     pickDrawCountdown += pickDrawInterval;
   } else {
     pickDrawCountdown--;
@@ -227,7 +227,7 @@ void Application::render() {
         case Y: mpos.y *= -1; break;
         case Z: mpos.z *= -1; break;
       }
-      
+
       glPushMatrix();
       glTranslated(mpos.x, mpos.y, mpos.z);
       GLUquadric *q = gluNewQuadric();
@@ -243,6 +243,8 @@ void Application::render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glBindFramebuffer(GL_FRAMEBUFFER, frntface_fbo);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // Rebind framebuffer to active
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   std::function<void(bool)> render_fn = [](bool b){};
 
@@ -293,7 +295,7 @@ void Application::render() {
             DynamicScene::Skeleton *skel = j->skeleton;
             if (ikTargets.find(j) != ikTargets.end()) {
               ikTargets.erase(j);
-            } 
+            }
             double dist = (j->getEndPosInWorld() - camera.position()).norm();
             ikTargets.emplace(j, getMouseProjection(dist));
             skel->reachForTarget(ikTargets, timeline.getCurrentFrame());
@@ -301,7 +303,7 @@ void Application::render() {
           }
         }
       }
-      
+
       timeline.step();
 
       render_fn = [this](bool depth){
@@ -319,7 +321,7 @@ void Application::render() {
           exit_2D_GL_draw_mode();
         }
       };
-      
+
       if (action == Action::Rasterize_Video) {
         rasterize_video();
         return;
@@ -1400,7 +1402,7 @@ void Application::mouse_pressed(e_mouse_button b) {
             auto skeleton = clickedJoint->skeleton;
             auto newJoint = skeleton->createNewJoint(clickedJoint, clickPos);
             scene->addObject(newJoint);
-            
+
             // If symmetry is enabled, create a mirrored joint
             if(symmetryEnabled) {
               auto p = clickedJoint;
@@ -1765,7 +1767,7 @@ void Application::rasterize_video() {
     sprintf(num, "%04d", timeline.getCurrentFrame());
     string fname = videoPrefix + string(num) + string(".png");
 
-    unsigned char *colors = new unsigned char[screenW * screenH * 4]; 
+    unsigned char *colors = new unsigned char[screenW * screenH * 4];
 
     glReadPixels(0, 0, screenW, screenH, GL_RGBA, GL_UNSIGNED_BYTE, colors);
 
