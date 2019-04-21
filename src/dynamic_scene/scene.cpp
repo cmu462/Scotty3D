@@ -3,7 +3,6 @@
 #include "../halfEdgeMesh.h"
 #include "mesh.h"
 #include "widgets.h"
-#include "../gl_errors.h"
 #include <fstream>
 
 using std::cout;

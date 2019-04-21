@@ -37,6 +37,7 @@ void XFormWidget::setTarget(Selection& _target) {
   target = _target;
   if (objectMode) {
     if (target.object == this) target.object = originalObj;
+    target.element = nullptr;
   }
 
   updateGeometry();
@@ -92,6 +93,19 @@ void XFormWidget::set_draw_styles(DrawStyle* defaultStyle,
   this->selectedStyle = selectedStyle;
 }
 
+static inline void apply_parent_transform(Selection target) {
+  // Only apply here if we are selecting an element inside of a
+  // transformed Mesh.  i.e. element != null && object != null
+  if (target.element != nullptr && target.object != nullptr) {
+    auto pos = target.object->position;
+    auto rot = target.object->rotation;
+    glTranslated(pos.x, pos.y, pos.z);
+    glRotated(rot.z, 0, 0, 1);
+    glRotated(rot.y, 0, 1, 0);
+    glRotated(rot.x, 1, 0, 0);
+  }
+}
+
 void XFormWidget::draw() {
   if (target.object == nullptr) return;
 
@@ -136,6 +150,8 @@ void XFormWidget::draw() {
 }
 
 void XFormWidget::drawHandles() const {
+  glPushMatrix();
+  apply_parent_transform(target);
   switch (mode) {
     case Mode::Translate:
       drawTranslateHandles();
@@ -149,6 +165,7 @@ void XFormWidget::drawHandles() const {
     default:
       break;
   }
+  glPopMatrix();
 }
 
 BBox XFormWidget::get_bbox() { return bounds; }
@@ -499,6 +516,8 @@ void XFormWidget::draw_pick(int& pickID, bool transformed) {
 
   glPushMatrix();
 
+  apply_parent_transform(target);
+
   switch (mode) {
     case Mode::Translate:
       drawTranslateHandles();
@@ -532,19 +551,20 @@ void XFormWidget::setSelection(int pickID, Selection& selection) {
   }
 }
 
+bool XFormWidget::getIsTransforming() const {
+  return isTransforming;
+}
+
 void XFormWidget::updateGeometry() {
   if (target.object == nullptr) return;
-
   axes.resize(3);
   if (objectMode) {
     Joint* joint = dynamic_cast<Joint*>(target.object);
     if (joint != nullptr) {
       if(poseMode)
         center = joint->getBasePosInWorld();
-      else if(joint != joint->skeleton->root)
-        center = joint->getEndPosInWorld();
       else
-        center = target.object->position;
+        center = joint->getEndPosInWorld();
     } else
       center = target.object->position;
 

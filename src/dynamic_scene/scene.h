@@ -248,7 +248,7 @@ class Scene {
    * time this function is called.
    */
   void getHoveredObject(const Vector2D &p, bool getElement = true,
-                        bool transformed = false);
+                        bool transformed = true);
 
   /**
    * Returns true iff there is a hovered feature in the scene.

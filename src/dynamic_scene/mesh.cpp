@@ -300,7 +300,7 @@ void Mesh::draw_edges() const {
     return;
 
   // Draw seleted edge
-  if (scene->hovered.element != nullptr) {
+  if(scene->hovered.element != nullptr) {
     Edge *ep = scene->hovered.element->getEdge();
     if (ep) {
       EdgeIter e = ep->halfedge()->edge();
@@ -314,7 +314,6 @@ void Mesh::draw_edges() const {
       glEnd();
     }
   }
-  
 
   // Draw all edges
   defaultStyle->style_edge();

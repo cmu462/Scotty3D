@@ -77,6 +77,8 @@ class XFormWidget : public SceneObject {
   // being applied to the whole object target.object.
   Selection target;
 
+  bool getIsTransforming() const;
+
   // Update the handle geometry to match the currently-selected
   // object.  We don't necessarily want to do this all the time
   // since often we want to provide the user with a consistent

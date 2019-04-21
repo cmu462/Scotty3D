@@ -94,7 +94,7 @@ void Joint::removeJoint(Scene* scene) {
 }
 
 void Joint::getAxes(vector<Vector3D>& axes) {
-  Matrix4x4 T = Matrix4x4::identity();
+  Matrix4x4 T = getRotation();
   for (Joint* j = parent; j != nullptr; j = j->parent) {
     T = j->getRotation() * T;
   }

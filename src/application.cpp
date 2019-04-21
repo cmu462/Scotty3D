@@ -898,6 +898,9 @@ void Application::executeFileOp(int codepoint) {
 }
 
 void Application::setGhosted(bool isGhosted) {
+  scene->selected.clear();
+  scene->removeObject(scene->elementTransform);
+
   this->isGhosted = isGhosted;
   for (auto object : scene->objects) {
     object->isGhosted = isGhosted;
@@ -905,6 +908,9 @@ void Application::setGhosted(bool isGhosted) {
 }
 
 void Application::toggleGhosted() {
+  scene->selected.clear();
+  scene->removeObject(scene->elementTransform);
+
   isGhosted = !isGhosted;
   for (auto object : scene->objects) {
     object->isGhosted = isGhosted;
@@ -1109,7 +1115,7 @@ void Application::keyboard_event(int key, int event, unsigned char mods) {
           }
           break;
         case GLFW_KEY_S:
-          if (event == GLFW_PRESS) {
+          if (event == GLFW_PRESS && !(mods & GLFW_MOD_SHIFT)) {
             integrator = Integrator::Symplectic_Euler;
           }
           break;
@@ -1422,7 +1428,7 @@ void Application::mouse_pressed(e_mouse_button b) {
 
             clickedJoint = newJoint;
           }
-        } else {
+        } else if (!scene->elementTransform->getIsTransforming()) {
           if (timeline.isCurrentlyPlaying()) return;
           selectHovered();
           if (action == Action::Wave) {
@@ -1461,41 +1467,41 @@ void Application::setupElementTransformWidget() {
     case VISUALIZE_MODE:
       break;
     case MODEL_MODE:
-      if (scene->selected.element != nullptr) {
-        scene->elementTransform->exitObjectMode();
-        scene->elementTransform->exitTransformedMode();
+      scene->elementTransform->exitObjectMode();
+      scene->elementTransform->exitTransformedMode();
+      scene->elementTransform->exitPoseMode();
+      if (scene->selected.element != nullptr  && scene->selected.object != scene->elementTransform) {
         scene->elementTransform->setTarget(scene->selected);
         scene->addObject(scene->elementTransform);
       }
       break;
     case ANIMATE_MODE:
       if (action == Action::Wave) {
-        if (scene->selected.element != nullptr) {
-          scene->elementTransform->exitObjectMode();
-          scene->elementTransform->enterTransformedMode();
+        scene->elementTransform->exitObjectMode();
+        scene->elementTransform->exitPoseMode();
+        scene->elementTransform->enterTransformedMode();
+        if (scene->selected.element != nullptr && scene->selected.object != scene->elementTransform) {
           scene->elementTransform->setTarget(scene->selected);
           scene->addObject(scene->elementTransform);
         }
       } else if (action == Action::Object) {
-        if (scene->selected.object != nullptr) {
-          // Only enable widget when joint is not selected
-          //DynamicScene::Joint *joint =
-          //    dynamic_cast<DynamicScene::Joint *>(scene->hovered.object);
-          //if (joint == nullptr) {
-            scene->elementTransform->enterObjectMode();
-            scene->elementTransform->setTranslate();
-            scene->elementTransform->setTarget(scene->selected);
-            scene->addObject(scene->elementTransform);
-          //}
+        scene->elementTransform->enterObjectMode();
+        scene->elementTransform->exitPoseMode();
+        scene->elementTransform->exitTransformedMode();
+        if (scene->selected.object != nullptr && scene->selected.object != scene->elementTransform) {
+          scene->elementTransform->setTarget(scene->selected);
+          scene->addObject(scene->elementTransform);
         }
       } else if (action == Action::Pose) {
-        if (scene->selected.object != nullptr) {
-          scene->elementTransform->enterObjectMode();
+        scene->elementTransform->enterObjectMode();
+        scene->elementTransform->exitTransformedMode();
+        if (scene->selected.object != nullptr && scene->selected.object != scene->elementTransform) {
           scene->elementTransform->setTarget(scene->selected);
           scene->addObject(scene->elementTransform);
 
           DynamicScene::Joint *joint =
-              dynamic_cast<DynamicScene::Joint *>(scene->hovered.object);
+              dynamic_cast<DynamicScene::Joint *>(scene->selected.object);
+
           if (joint != nullptr) {
             bool isRoot = joint == joint->skeleton->root;
             scene->elementTransform->enterPoseMode();
@@ -1508,6 +1514,8 @@ void Application::setupElementTransformWidget() {
           } else {
             scene->elementTransform->exitPoseMode();
           }
+
+          scene->elementTransform->updateGeometry(); // enterPoseMode affects updateGeometry
         }
       }
       break;
@@ -1676,21 +1684,38 @@ void Application::switch_modes(unsigned int key) {
     case 'a':
     case 'A':
       to_animate_mode();
+      setupElementTransformWidget();
       break;
     case 'm':
     case 'M':
       to_model_mode();
+      setupElementTransformWidget();
       break;
     case 'r':
     case 'R':
       to_render_mode();
+      setupElementTransformWidget();
       break;
     case 'v':
     case 'V':
       to_visualize_mode();
+      setupElementTransformWidget();
       break;
     default:
       break;
+  }
+}
+
+static void reset_vertex_positions(DynamicScene::Mesh *m, bool to_animate_mode) {
+  auto begin = m->mesh.verticesBegin();
+  auto end = m->mesh.verticesEnd();
+  for (auto cur = begin; cur != end; ++cur) {
+    if (to_animate_mode)
+      // Reset the vertex positions to their bind positions so we can edit the model
+      cur->bindPosition = cur->position;
+    else
+      // Set the bind positions to their (potentially modified) positions in edit mode so they can get skinned
+      cur->position = cur->bindPosition;
   }
 }
 
@@ -1698,12 +1723,18 @@ void Application::to_model_mode() {
   if (mode == MODEL_MODE) return;
   pathtracer->stop();
   pathtracer->clear();
-  mode = MODEL_MODE;
+  scene->selected.clear();
+
   for (auto o : scene->objects) {
-    if (o->getInfo()[0][0] == 'M' && o != scene->elementTransform) {  // Mesh
-      ((DynamicScene::Mesh *)o)->resetWave();
+    DynamicScene::Mesh *m = dynamic_cast<DynamicScene::Mesh *>(o);
+    if (m != nullptr) {  // Mesh
+      m->resetWave();
+
+      reset_vertex_positions(m, false);
     }
   }
+
+  mode = MODEL_MODE;
 
   action = Action::Navigate;
   setGhosted(false);
@@ -1711,6 +1742,7 @@ void Application::to_model_mode() {
 
 void Application::to_render_mode() {
   if (mode == RENDER_MODE) return;
+  scene->selected.clear();
   scene->triangulateSelection();
   set_up_pathtracer();
   pathtracer->stop();
@@ -1721,6 +1753,7 @@ void Application::to_render_mode() {
 
 void Application::to_animate_mode() {
   if (mode == ANIMATE_MODE) return;
+  scene->selected.clear();
   pathtracer->stop();
   pathtracer->clear();
   mode = ANIMATE_MODE;
@@ -1728,15 +1761,18 @@ void Application::to_animate_mode() {
   for (DynamicScene::SceneObject *o : scene->objects) {
     DynamicScene::Mesh *m = dynamic_cast<DynamicScene::Mesh *>(o);
     if (m != nullptr) {
+      reset_vertex_positions(m, true);
+
       scene->addObject(m->skeleton);
     }
   }
   integrator = Integrator::Forward_Euler;
-  setGhosted(true);
+  setGhosted(false);
 }
 
 void Application::to_visualize_mode() {
   if (mode == VISUALIZE_MODE) return;
+  scene->selected.clear();
   set_up_pathtracer();
   pathtracer->stop();
   pathtracer->start_visualizing();
