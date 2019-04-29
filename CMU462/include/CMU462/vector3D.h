@@ -5,6 +5,7 @@
 
 #include <ostream>
 #include <cmath>
+#include <array>
 
 namespace CMU462 {
 
@@ -14,8 +15,14 @@ namespace CMU462 {
 class Vector3D {
  public:
 
-  // components
-  double x, y, z;
+  /**
+   * this type-punning is still technically undefined behavior, but all major
+   * compilers explicitly define it (gcc, clang, msvc)
+  */
+  union {
+    struct { double x; double y; double z; };
+    std::array<double, 3> data;
+  };
 
   /**
    * Constructor.
@@ -43,12 +50,12 @@ class Vector3D {
 
   // returns reference to the specified component (0-based indexing: x, y, z)
   inline double& operator[] ( const int& index ) {
-    return ( &x )[ index ];
+    return data[index];
   }
 
   // returns const reference to the specified component (0-based indexing: x, y, z)
   inline const double& operator[] ( const int& index ) const {
-    return ( &x )[ index ];
+    return data[index];
   }
 
   inline bool operator==( const Vector3D& v) const {

@@ -15,8 +15,14 @@ namespace CMU462 {
 class Vector4D {
  public:
 
-  // components
-  double x, y, z, w;
+  /**
+   * this type-punning is still technically undefined behavior, but all major
+   * compilers explicitly define it (gcc, clang, msvc)
+  */
+  union {
+    struct { double x; double y; double z; double w; };
+    std::array<double, 4> data;
+  };
 
   /**
    * Constructor.
@@ -63,12 +69,12 @@ class Vector4D {
 
   // returns reference to the specified component (0-based indexing: x, y, z)
   inline double& operator[] ( const int& index ) {
-    return ( &x )[ index ];
+    return data[ index ];
   }
 
   // returns const reference to the specified component (0-based indexing: x, y, z)
   inline const double& operator[] ( const int& index ) const {
-    return ( &x )[ index ];
+    return data[ index ];
   }
 
   // negation
