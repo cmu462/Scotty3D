@@ -1,1 +1,8 @@
 .DS_Store
+build
+exr
+build_debug
+*.sublime-workspace
+*.sublime-project
+.idea/
+cmake-build-debug/
