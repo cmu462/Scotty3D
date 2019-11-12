@@ -142,7 +142,8 @@ class Timeline {
   bool isLooping;
 
   // this stores which button the user is currently hovering over.
-  int hover_button_index;
+  int hover_button_index = -1;
+  int selected_button_index = -1;
 
   // WARNING: Don't change the values REWIND - LOOP.
   enum e_Element {
