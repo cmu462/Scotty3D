@@ -119,8 +119,6 @@ class Application : public Renderer {
   };
   Action action;
 
-  bool noGUI;
-
   enum class Integrator { Forward_Euler, Symplectic_Euler };
   Integrator integrator;
 

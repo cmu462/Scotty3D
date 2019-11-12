@@ -763,7 +763,7 @@ StaticScene::SceneObject *Mesh::get_transformed_static_object(double t) {
   vector<Vector3D> originalPositions;
 
   Vector3D position = positions(t);
-  Vector3D rotate = rotations(t) * (PI / 180.);
+  Vector3D rotate = rotations(t);
   Vector3D scale = scales(t);
 
   Matrix4x4 S = Matrix4x4::identity();

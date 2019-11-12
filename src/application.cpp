@@ -315,9 +315,8 @@ void Application::render() {
         scene->render_splines_at(timeline.getCurrentFrame(),
                                timeline.isCurrentlyPlaying(), useCapsuleRadius, depth);
 
-        if(!depth && !noGUI) {
+        if(!depth) {
           enter_2D_GL_draw_mode();
-          timeline.mouse_over(mouseX, mouseY);
           timeline.draw();
           exit_2D_GL_draw_mode();
         }
@@ -325,6 +324,7 @@ void Application::render() {
 
       if (action == Action::Rasterize_Video) {
         rasterize_video();
+        return;
       }
       break;
   }
@@ -449,7 +449,6 @@ void Application::set_projection_matrix() {
 string Application::name() { return "Scotty3D"; }
 
 string Application::info() {
-  if(noGUI) { return ""; }
   switch (mode) {
     case MODEL_MODE:
       return "MeshEdit";
@@ -952,7 +951,6 @@ void Application::updateWidgets() {
 }
 
 void Application::keyboard_event(int key, int event, unsigned char mods) {
-  noGUI = false;
   switch (mode) {
     case ANIMATE_MODE:
       switch (key) {
@@ -1795,7 +1793,6 @@ void Application::set_up_pathtracer() {
 }
 
 void Application::rasterize_video() {
-  noGUI = true;
   scene->removeObject(scene->elementTransform);
   static string videoPrefix;
 
@@ -1808,21 +1805,12 @@ void Application::rasterize_video() {
 
     unsigned char *colors = new unsigned char[screenW * screenH * 4];
 
-    float *red =  new float[screenW * screenH];
-    float *green =  new float[screenW * screenH];
-    float *blue =  new float[screenW * screenH];
+    glReadPixels(0, 0, screenW, screenH, GL_RGBA, GL_UNSIGNED_BYTE, colors);
 
-    glReadBuffer( GL_FRONT );
-    glReadPixels(0, 0, screenW, screenH, GL_RED, GL_FLOAT, red);
-    glReadPixels(0, 0, screenW, screenH, GL_GREEN, GL_FLOAT, green);
-    glReadPixels(0, 0, screenW, screenH, GL_BLUE, GL_FLOAT, blue);
-    
-    for (int i = 0; i < screenW * screenH; i++) {
-      colors[4*i    ] = (unsigned char)(red[i] * 255);
-      colors[4*i + 1] = (unsigned char)(green[i] * 255);
-      colors[4*i + 2] = (unsigned char)(blue[i] * 255);
-      colors[4*i + 3] = 255;
-    } 
+    // Clear transparency
+    for (int i = 3; i < screenW * screenH * 4; i += 4) {
+      colors[i] = 255;
+    }
 
     uint32_t *frame = (uint32_t *)colors;
     size_t w = screenW;
@@ -2102,25 +2090,25 @@ void Application::draw_action() {
         break;
     }
     Color integrator_color(0.7, 0.3, 0.7);
-    draw_string(x0, y + 40, integrator_string.str(), size, integrator_color);
+    draw_string(x0, y + 30, integrator_string.str(), size, integrator_color);
     stringstream timestep_string;
     timestep_string << "Timestep: " << timestep;
-    draw_string(x0, y + 80, timestep_string.str(), size, integrator_color);
+    draw_string(x0, y + 60, timestep_string.str(), size, integrator_color);
     stringstream damping_string;
     damping_string << "Damping Factor: " << damping_factor;
-    draw_string(x0, y + 120, damping_string.str(), size, integrator_color);
+    draw_string(x0, y + 90, damping_string.str(), size, integrator_color);
     stringstream lbs_string;
     lbs_string << "Linear Blend Skinning: "
                << (useCapsuleRadius ? "Threshold" : "Naive");
-    draw_string(x0, y + 160, lbs_string.str(), size, integrator_color);
+    draw_string(x0, y + 120, lbs_string.str(), size, integrator_color);
 
     if(action == Action::CreateJoint) {
       stringstream sym_string;
       sym_string << "Joint Symmetry: " << (symmetryEnabled ? "Enabled" : "Disabled");
-      draw_string(x0, y + 200, sym_string.str(), size, integrator_color);
+      draw_string(x0, y + 150, sym_string.str(), size, integrator_color);
       stringstream axis_string;
       axis_string << "Symmetry Axis: " << ((char)symmetryAxis);
-      draw_string(x0, y + 240, axis_string.str(), size, integrator_color);
+      draw_string(x0, y + 180, axis_string.str(), size, integrator_color);
     }
   }
 

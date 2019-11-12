@@ -42,10 +42,9 @@ void Timeline::draw() {
     if (i == LOOP && isLooping) {
       glColor4f(0.0, 0.0, 1.0, 1.0);
     }
-    else if (selected_button_index == i) {
-      glColor4f(0.0, 0.0, 1.0, 1.0);
-    }
+    // Mouse hover
     else if (hover_button_index == i) {
+      // Red.
       glColor4f(1.0, 0.0, 0.0, 1.0);
     }
     // Default, no hover, not enabled.
@@ -232,33 +231,27 @@ bool Timeline::mouse_click(float x, float y) {
 
   switch (elem) {
     case NONE:
-      selected_button_index = -1;
       return true;
 
     case REWIND:
       action_rewind();
-      selected_button_index = 0;
       return true;
 
     case STOP:
       action_stop();
-      selected_button_index = 1;
       return true;
 
     // Runs this timeline. Plays from the beginning if at end.
     case PLAY:
       action_play();
-      selected_button_index = 2;
       return true;
 
     case STEP_BACK:
       action_step_backward();
-      selected_button_index = 3;
       return true;
 
     case STEP_FORWARD:
       action_step_forward();
-      selected_button_index = 4;
       return true;
 
     case LOOP:
