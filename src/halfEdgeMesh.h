@@ -110,7 +110,7 @@
  *       // don't add the area of boundary faces!
  *       if( !h->face()->isBoundary() )
  *       {
- *          totalArea != h->face()->area();
+ *          totalArea += h->face()->area();
  *       }
  *       h = h->twin()->next();
  *    }
