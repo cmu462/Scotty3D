@@ -6,6 +6,17 @@
 
 namespace CMU462 {
 
+	// find the previous HalfedgeIter of a given HalfedgeIter
+	HalfedgeIter prev_Halfedge(HalfedgeIter x) {
+		HalfedgeIter prev = x, curr = x->next();
+		while (curr != x) {
+			prev = curr;
+			curr = curr->next();
+		}
+		return prev;
+	}
+
+
 VertexIter HalfedgeMesh::splitEdge(EdgeIter e0) {
   // TODO: (meshEdit)
   // This method should split the given edge and return an iterator to the
@@ -17,12 +28,56 @@ VertexIter HalfedgeMesh::splitEdge(EdgeIter e0) {
 }
 
 VertexIter HalfedgeMesh::collapseEdge(EdgeIter e) {
-  // TODO: (meshEdit)
-  // This method should collapse the given edge and return an iterator to
-  // the new vertex created by the collapse.
+	// TODO: (meshEdit)
+	// This method should collapse the given edge and return an iterator to
+	// the new vertex created by the collapse.
 
-  showError("collapseEdge() not implemented.");
-  return VertexIter();
+	HalfedgeIter temp;
+	HalfedgeIter halfedge1 = e->halfedge();
+	HalfedgeIter halfedge2 = e->halfedge()->twin();
+	VertexIter vertex1 = halfedge1->vertex();
+	VertexIter vertex2 = halfedge2->vertex();
+
+	vector<HalfedgeIter> halfedge_to_change;
+	temp = halfedge1;
+	do {
+		halfedge_to_change.push_back(temp);
+		temp = temp->twin()->next();
+	} while (temp != halfedge1);
+	temp = halfedge2;
+	do {
+		halfedge_to_change.push_back(temp);
+		temp = temp->twin()->next();
+	} while (temp != halfedge2);
+
+	Vector3D new_coord = (vertex1->position + vertex2->position) / 2.0;
+	VertexIter new_vertex = vertex1;
+	new_vertex->position = new_coord;
+
+	for (auto x : halfedge_to_change) {
+		x->vertex() = new_vertex;
+	}
+	new_vertex->halfedge() = halfedge_to_change[halfedge_to_change.size() - 1];
+
+	for (auto x : vector<HalfedgeIter>{ halfedge1,halfedge2 }) {
+		if (x->face()->degree() == 3) {
+			// TO DO
+		}
+		else {
+			if (x->face()->halfedge() == x) x->face()->halfedge() = x->next();
+			prev_Halfedge(x)->next() = x->next();
+		}
+	}
+
+
+	deleteHalfedge(halfedge1);
+	deleteHalfedge(halfedge2);
+	//deleteVertex(vertex1);
+	deleteVertex(vertex2);
+	deleteEdge(e);
+	//cout << vertex1->position[0] << " , "<< vertex1->position[1] << " , " << vertex1->position[2] << endl;
+	//showError("HOYAAAAAAAAAAAAA");
+	return new_vertex;
 }
 
 VertexIter HalfedgeMesh::collapseFace(FaceIter f) {
