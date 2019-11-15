@@ -443,7 +443,7 @@ void HalfedgeMesh::bevelFaceComputeNewPositions(
   // newHalfedges and vertex positions
   // in orig.  So, you can write loops of the form
   //
-  // for( int i = 0; i < newHalfedges.size(); hs++ )
+  // for( int i = 0; i < newHalfedges.size(); i++ )
   // {
   //    Vector3D pi = originalVertexPositions[i]; // get the original vertex
   //    position correponding to vertex i
