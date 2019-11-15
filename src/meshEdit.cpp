@@ -340,16 +340,88 @@ FaceIter HalfedgeMesh::bevelEdge(EdgeIter e) {
 }
 
 FaceIter HalfedgeMesh::bevelFace(FaceIter f) {
-  // TODO This method should replace the face f with an additional, inset face
-  // (and ring of faces around it), corresponding to a bevel operation. It
-  // should return the new face.  NOTE: This method is responsible for updating
-  // the *connectivity* of the mesh only---it does not need to update the vertex
-  // positions.  These positions will be updated in
-  // HalfedgeMesh::bevelFaceComputeNewPositions (which you also have to
-  // implement!)
+	// TODO This method should replace the face f with an additional, inset face
+	// (and ring of faces around it), corresponding to a bevel operation. It
+	// should return the new face.  NOTE: This method is responsible for updating
+	// the *connectivity* of the mesh only---it does not need to update the vertex
+	// positions.  These positions will be updated in
+	// HalfedgeMesh::bevelFaceComputeNewPositions (which you also have to
+	// implement!)
 
-  showError("bevelFace() not implemented.");
-  return facesBegin();
+	int n = f->degree();
+	vector<VertexIter> old_vertex;
+	vector<HalfedgeIter> old_halfedge;
+	HalfedgeIter h = f->halfedge();
+	do {
+		old_vertex.push_back(h->vertex());
+		old_halfedge.push_back(h);
+		h = h->next();
+	} while (h != f->halfedge());
+
+	FaceIter new_face = newFace();
+	vector<FaceIter> sideFace;
+	vector<EdgeIter> innerEdge;
+	vector<EdgeIter> connectingEdge;
+	vector<VertexIter> new_vertex;
+	vector<HalfedgeIter> outward_halfedge;
+	vector<HalfedgeIter> inward_halfedge;
+	vector<HalfedgeIter> inside_halfedge;
+	vector<HalfedgeIter> inside_twin_halfedge;
+
+	for (int i = 0; i < n; i++) {
+		sideFace.push_back(newFace());
+		innerEdge.push_back(newEdge());
+		connectingEdge.push_back(newEdge());
+		new_vertex.push_back(newVertex());
+		outward_halfedge.push_back(newHalfedge());
+		inward_halfedge.push_back(newHalfedge());
+		inside_halfedge.push_back(newHalfedge());
+		inside_twin_halfedge.push_back(newHalfedge());
+	}
+
+	int i_plus_1, i_minus_1;
+	for (int i = 0; i < n; i++) {
+		i_plus_1 = (i + 1) % n;
+		i_minus_1 = (i - 1 + n) % n;
+
+		new_vertex[i]->position = old_vertex[i]->position;
+
+		old_vertex[i]->halfedge() = inward_halfedge[i];
+		inward_halfedge[i]->vertex() = old_vertex[i];
+		new_vertex[i]->halfedge() = outward_halfedge[i];
+		outward_halfedge[i]->vertex() = new_vertex[i];
+		inside_twin_halfedge[i]->vertex() = new_vertex[i];
+		inside_halfedge[i]->vertex() = new_vertex[i_plus_1];
+
+		outward_halfedge[i]->twin() = inward_halfedge[i_plus_1];
+		inward_halfedge[i_plus_1]->twin() = outward_halfedge[i];
+		inside_halfedge[i]->twin() = inside_twin_halfedge[i];
+		inside_twin_halfedge[i]->twin() = inside_halfedge[i];
+		
+		outward_halfedge[i]->face() = sideFace[i];
+		inward_halfedge[i]->face() = sideFace[i];
+		inside_twin_halfedge[i]->face() = sideFace[i];
+		old_halfedge[i]->face() = sideFace[i];
+		sideFace[i]->halfedge() = old_halfedge[i];
+		inside_halfedge[i]->face() = new_face;
+		
+		inside_halfedge[i]->edge() = innerEdge[i];
+		inside_twin_halfedge[i]->edge() = innerEdge[i];
+		innerEdge[i]->halfedge() = inside_halfedge[i];
+
+		outward_halfedge[i]->edge() = connectingEdge[i_plus_1];
+		inward_halfedge[i]->edge() = connectingEdge[i];
+		connectingEdge[i]->halfedge() = inward_halfedge[i];
+
+		old_halfedge[i]->next() = inward_halfedge[i];
+		inward_halfedge[i]->next() = inside_twin_halfedge[i];
+		inside_twin_halfedge[i]->next() = outward_halfedge[i];
+		outward_halfedge[i]->next() = old_halfedge[i];
+		inside_halfedge[i]->next() = inside_halfedge[i_plus_1];
+	}
+	new_face->halfedge() = inside_halfedge[0];
+	//showError("bevelFace() not implemented.");
+	return new_face;
 }
 
 
@@ -377,7 +449,7 @@ void HalfedgeMesh::bevelFaceComputeNewPositions(
   //    position correponding to vertex i
   // }
   //
-
+	showError("HOYAAAAAAAAAAAA");
 }
 
 void HalfedgeMesh::bevelVertexComputeNewPositions(
