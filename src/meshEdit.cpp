@@ -51,7 +51,7 @@ VertexIter HalfedgeMesh::collapseEdge(EdgeIter e) {
 	} while (temp != halfedge2);
 
 	Vector3D new_coord = (vertex1->position + vertex2->position) / 2.0;
-	VertexIter new_vertex = vertex1;
+	VertexIter new_vertex = newVertex();
 	new_vertex->position = new_coord;
 
 	for (auto x : halfedge_to_change) {
@@ -61,7 +61,18 @@ VertexIter HalfedgeMesh::collapseEdge(EdgeIter e) {
 
 	for (auto x : vector<HalfedgeIter>{ halfedge1,halfedge2 }) {
 		if (x->face()->degree() == 3) {
-			// TO DO
+			HalfedgeIter a = x->next();
+			HalfedgeIter b = a->next();
+			a->twin()->twin() = b->twin();
+			b->twin()->twin() = a->twin();
+			b->twin()->edge() = a->edge();
+			if (a->edge()->halfedge() == a)a->edge()->halfedge() = b->twin();
+			if (b->vertex()->halfedge() == b) b->vertex()->halfedge() = a->twin();
+
+			deleteFace(x->face());
+			deleteEdge(b->edge());
+			deleteHalfedge(a);
+			deleteHalfedge(b);
 		}
 		else {
 			if (x->face()->halfedge() == x) x->face()->halfedge() = x->next();
@@ -72,7 +83,7 @@ VertexIter HalfedgeMesh::collapseEdge(EdgeIter e) {
 
 	deleteHalfedge(halfedge1);
 	deleteHalfedge(halfedge2);
-	//deleteVertex(vertex1);
+	deleteVertex(vertex1);
 	deleteVertex(vertex2);
 	deleteEdge(e);
 	//cout << vertex1->position[0] << " , "<< vertex1->position[1] << " , " << vertex1->position[2] << endl;
