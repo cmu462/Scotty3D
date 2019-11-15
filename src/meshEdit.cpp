@@ -1,5 +1,6 @@
 #include <float.h>
 #include <assert.h>
+#include <algorithm>
 #include "meshEdit.h"
 #include "mutablePriorityQueue.h"
 #include "error_dialog.h"
@@ -390,16 +391,16 @@ FaceIter HalfedgeMesh::bevelFace(FaceIter f) {
 		inward_halfedge[i]->vertex() = old_vertex[i];
 		new_vertex[i]->halfedge() = outward_halfedge[i];
 		outward_halfedge[i]->vertex() = new_vertex[i];
-		inside_twin_halfedge[i]->vertex() = new_vertex[i];
-		inside_halfedge[i]->vertex() = new_vertex[i_plus_1];
+		inside_twin_halfedge[i]->vertex() = new_vertex[i_plus_1];
+		inside_halfedge[i]->vertex() = new_vertex[i];
 
-		outward_halfedge[i]->twin() = inward_halfedge[i_plus_1];
-		inward_halfedge[i_plus_1]->twin() = outward_halfedge[i];
+		outward_halfedge[i]->twin() = inward_halfedge[i];
+		inward_halfedge[i]->twin() = outward_halfedge[i];
 		inside_halfedge[i]->twin() = inside_twin_halfedge[i];
 		inside_twin_halfedge[i]->twin() = inside_halfedge[i];
 		
 		outward_halfedge[i]->face() = sideFace[i];
-		inward_halfedge[i]->face() = sideFace[i];
+		inward_halfedge[i]->face() = sideFace[i_minus_1];
 		inside_twin_halfedge[i]->face() = sideFace[i];
 		old_halfedge[i]->face() = sideFace[i];
 		sideFace[i]->halfedge() = old_halfedge[i];
@@ -409,12 +410,12 @@ FaceIter HalfedgeMesh::bevelFace(FaceIter f) {
 		inside_twin_halfedge[i]->edge() = innerEdge[i];
 		innerEdge[i]->halfedge() = inside_halfedge[i];
 
-		outward_halfedge[i]->edge() = connectingEdge[i_plus_1];
+		outward_halfedge[i]->edge() = connectingEdge[i];
 		inward_halfedge[i]->edge() = connectingEdge[i];
 		connectingEdge[i]->halfedge() = inward_halfedge[i];
 
-		old_halfedge[i]->next() = inward_halfedge[i];
-		inward_halfedge[i]->next() = inside_twin_halfedge[i];
+		old_halfedge[i]->next() = inward_halfedge[i_plus_1];
+		inward_halfedge[i]->next() = inside_twin_halfedge[i_minus_1];
 		inside_twin_halfedge[i]->next() = outward_halfedge[i];
 		outward_halfedge[i]->next() = old_halfedge[i];
 		inside_halfedge[i]->next() = inside_halfedge[i_plus_1];
@@ -426,30 +427,49 @@ FaceIter HalfedgeMesh::bevelFace(FaceIter f) {
 
 
 void HalfedgeMesh::bevelFaceComputeNewPositions(
-    vector<Vector3D>& originalVertexPositions,
-    vector<HalfedgeIter>& newHalfedges, double normalShift,
-    double tangentialInset) {
-  // TODO Compute new vertex positions for the vertices of the beveled face.
-  //
-  // These vertices can be accessed via newHalfedges[i]->vertex()->position for
-  // i = 1, ..., newHalfedges.size()-1.
-  //
-  // The basic strategy here is to loop over the list of outgoing halfedges,
-  // and use the preceding and next vertex position from the original mesh
-  // (in the originalVertexPositions array) to compute an offset vertex
-  // position.
-  //
-  // Note that there is a 1-to-1 correspondence between halfedges in
-  // newHalfedges and vertex positions
-  // in orig.  So, you can write loops of the form
-  //
-  // for( int i = 0; i < newHalfedges.size(); i++ )
-  // {
-  //    Vector3D pi = originalVertexPositions[i]; // get the original vertex
-  //    position correponding to vertex i
-  // }
-  //
-	showError("HOYAAAAAAAAAAAA");
+	vector<Vector3D>& originalVertexPositions,
+	vector<HalfedgeIter>& newHalfedges, double normalShift,
+	double tangentialInset) {
+	// TODO Compute new vertex positions for the vertices of the beveled face.
+	//
+	// These vertices can be accessed via newHalfedges[i]->vertex()->position for
+	// i = 1, ..., newHalfedges.size()-1.
+	//
+	// The basic strategy here is to loop over the list of outgoing halfedges,
+	// and use the preceding and next vertex position from the original mesh
+	// (in the originalVertexPositions array) to compute an offset vertex
+	// position.
+	//
+	// Note that there is a 1-to-1 correspondence between halfedges in
+	// newHalfedges and vertex positions
+	// in orig.  So, you can write loops of the form
+	//
+	// for( int i = 0; i < newHalfedges.size(); i++ )
+	// {
+	//    Vector3D pi = originalVertexPositions[i]; // get the original vertex
+	//    position correponding to vertex i
+	// }
+	//
+	int i_plus_1,i_minus_1,n = newHalfedges.size();
+	for (int i = 0; i < n; i++){
+		i_plus_1 = (i + 1) % n;
+		i_minus_1 = (i - 1 + n) % n;
+
+		Vector3D a = originalVertexPositions[i];
+		Vector3D b = originalVertexPositions[i_plus_1];
+		Vector3D c = originalVertexPositions[i_minus_1];
+
+		Vector3D ba = b - a;
+		ba /= ba.norm();
+		Vector3D ca = c - a;
+		ca /= ca.norm();
+
+		Vector3D dir = ba + ca;
+		dir /= dir.norm();
+
+		//newHalfedges[i]->vertex()->position += dir * tangentialInset;
+		newHalfedges[i]->vertex()->position += tangentialInset * a.norm();
+	}
 }
 
 void HalfedgeMesh::bevelVertexComputeNewPositions(
