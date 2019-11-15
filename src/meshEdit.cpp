@@ -460,18 +460,22 @@ void HalfedgeMesh::bevelFaceComputeNewPositions(
 		Vector3D c = originalVertexPositions[i_minus_1];
 
 		Vector3D ab = b - a;
-		ab /= ab.norm();
+		//ab /= ab.norm();
+		ab = ab.unit();
 		Vector3D ac = c - a;
-		ac /= ac.norm();
+		ac = ac.unit();
 
+		// tangential shift
 		Vector3D dir = ab + ac;
-		dir /= dir.norm();
-
-		Vector3D perpendicular = dir - ab * (dir[0] * ab[0] + dir[1] * ab[1] + dir[2] * ab[2]);
+		dir = dir.unit();
+		Vector3D perpendicular = dir - ab * dot(dir,ab);
 		double distance = tangentialInset / perpendicular.norm();
-
 		newHalfedges[i]->vertex()->position += dir * distance;
-		//newHalfedges[i]->vertex()->position += tangentialInset * a.norm();
+
+		// normal shift
+		Vector3D normal = cross(ab, ac);
+		normal = normal.unit();
+		newHalfedges[i]->vertex()->position += normal * normalShift;
 	}
 }
 
