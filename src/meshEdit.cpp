@@ -1,6 +1,5 @@
 #include <float.h>
 #include <assert.h>
-#include <algorithm>
 #include "meshEdit.h"
 #include "mutablePriorityQueue.h"
 #include "error_dialog.h"
@@ -523,9 +522,53 @@ void HalfedgeMesh::splitPolygons(vector<FaceIter>& fcs) {
 }
 
 void HalfedgeMesh::splitPolygon(FaceIter f) {
-  // TODO: (meshedit) 
-  // Triangulate a polygonal face
-  showError("splitPolygon() not implemented.");
+	// TODO: (meshedit) 
+	// Triangulate a polygonal face
+	if (f->degree() < 4) return;
+
+	VertexIter main_vertex = f->halfedge()->vertex();
+	HalfedgeIter last_Halfedge = prev_Halfedge(f->halfedge());
+	vector<VertexIter> vertexes;
+
+	HalfedgeIter temp = f->halfedge()->next()->next();
+	do {
+		vertexes.push_back(temp->vertex());
+		temp = temp->next();
+	} while (temp != f->halfedge());
+	vertexes.pop_back();
+
+	for (VertexIter curr_vertex : vertexes) {
+		FaceIter new_Face = newFace();
+		EdgeIter new_Edge = newEdge();
+		HalfedgeIter new_Halfedge1 = newHalfedge();
+		HalfedgeIter new_Halfedge2 = newHalfedge();
+
+		HalfedgeIter main_Halfedge = f->halfedge();
+
+		new_Halfedge1->edge() = new_Edge;
+		new_Halfedge2->edge() = new_Edge;
+		new_Edge->halfedge() = new_Halfedge1;
+
+		new_Halfedge1->twin() = new_Halfedge2;
+		new_Halfedge2->twin() = new_Halfedge1;
+
+		new_Halfedge1->vertex() = curr_vertex;
+		curr_vertex->halfedge() = new_Halfedge1;
+		new_Halfedge2->vertex() = main_vertex;
+		main_vertex->halfedge() = new_Halfedge2;
+
+		new_Halfedge1->face() = new_Face;
+		new_Face->halfedge() = new_Halfedge1;
+		new_Halfedge2->face() = f;
+		f->halfedge() = new_Halfedge2;
+
+		new_Halfedge2->next() = main_Halfedge->next()->next();
+		main_Halfedge->next()->next() = new_Halfedge1;
+		new_Halfedge1->next() = main_Halfedge;
+		last_Halfedge->next() = new_Halfedge2;
+	}
+
+	//showError("splitPolygon() not implemented.");
 }
 
 EdgeRecord::EdgeRecord(EdgeIter& _edge) : edge(_edge) {
