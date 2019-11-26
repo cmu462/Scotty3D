@@ -208,16 +208,26 @@ void HalfedgeMesh::subdivideQuad(bool useCatmullClark) {
  * centroids.
  */
 void HalfedgeMesh::computeLinearSubdivisionPositions() {
-  // TODO For each vertex, assign Vertex::newPosition to
-  // its original position, Vertex::position.
+	// TODO For each vertex, assign Vertex::newPosition to
+	// its original position, Vertex::position.
+	for (VertexIter x = verticesBegin(); x != verticesEnd(); x++) {
+		x->newPosition = x->position;
+	}
 
-  // TODO For each edge, assign the midpoint of the two original
-  // positions to Edge::newPosition.
+	// TODO For each edge, assign the midpoint of the two original
+	// positions to Edge::newPosition.
+	for (EdgeIter x = edgesBegin(); x != edgesEnd(); x++) {
+		x->newPosition = x->centroid();
+	}
 
-  // TODO For each face, assign the centroid (i.e., arithmetic mean)
-  // of the original vertex positions to Face::newPosition.  Note
-  // that in general, NOT all faces will be triangles!
-  showError("computeLinearSubdivisionPositions() not implemented.");
+	// TODO For each face, assign the centroid (i.e., arithmetic mean)
+	// of the original vertex positions to Face::newPosition.  Note
+	// that in general, NOT all faces will be triangles!
+	for (FaceIter x = facesBegin(); x != facesEnd(); x++) {
+		x->newPosition = x->centroid();
+	}
+
+	//showError("computeLinearSubdivisionPositions() not implemented.");
 }
 
 /**
@@ -250,15 +260,29 @@ void HalfedgeMesh::computeCatmullClarkPositions() {
  * subdivided using Catmull-Clark (or linear) subdivision.
  */
 void HalfedgeMesh::assignSubdivisionIndices() {
-  // TODO Start a counter at zero; if you like, you can use the
-  // "Index" type (defined in halfedgeMesh.h)
+	// TODO Start a counter at zero; if you like, you can use the
+	// "Index" type (defined in halfedgeMesh.h)
+	Index i = 0;
 
-  // TODO Iterate over vertices, assigning values to Vertex::index
+	// TODO Iterate over vertices, assigning values to Vertex::index
+	for (VertexIter x = verticesBegin(); x != verticesEnd(); x++) {
+		x->index = i;
+		i++;
+	}
 
-  // TODO Iterate over edges, assigning values to Edge::index
+	// TODO Iterate over edges, assigning values to Edge::index
+	for (EdgeIter x = edgesBegin(); x != edgesEnd(); x++) {
+		x->index = i;
+		i++;
+	}
 
-  // TODO Iterate over faces, assigning values to Face::index
-  showError("assignSubdivisionIndices() not implemented.");
+	// TODO Iterate over faces, assigning values to Face::index
+	for (FaceIter x = facesBegin(); x != facesEnd(); x++) {
+		x->index = i;
+		i++;
+	}
+	
+	//showError("assignSubdivisionIndices() not implemented.");
 }
 
 /**
