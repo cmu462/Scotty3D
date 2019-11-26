@@ -585,6 +585,7 @@ void HalfedgeMesh::splitPolygon(FaceIter f) {
 	} while (temp != f->halfedge());
 	vertexes.pop_back();
 
+
 	for (VertexIter curr_vertex : vertexes) {
 		FaceIter new_Face = newFace();
 		EdgeIter new_Edge = newEdge();
@@ -614,6 +615,9 @@ void HalfedgeMesh::splitPolygon(FaceIter f) {
 		main_Halfedge->next()->next() = new_Halfedge1;
 		new_Halfedge1->next() = main_Halfedge;
 		last_Halfedge->next() = new_Halfedge2;
+
+		main_Halfedge->face() = new_Face;
+		main_Halfedge->next()->face() = new_Face;
 	}
 
 	//showError("splitPolygon() not implemented.");
