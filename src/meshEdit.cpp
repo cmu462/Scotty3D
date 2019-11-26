@@ -406,7 +406,7 @@ FaceIter HalfedgeMesh::bevelFace(FaceIter f) {
 		h = h->next();
 	} while (h != f->halfedge());
 
-	FaceIter new_face = newFace();
+	FaceIter new_face = f;
 	vector<FaceIter> sideFace;
 	vector<EdgeIter> innerEdge;
 	vector<EdgeIter> connectingEdge;
