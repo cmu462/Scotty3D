@@ -4,6 +4,8 @@
 #include "mutablePriorityQueue.h"
 #include "error_dialog.h"
 
+Index max_i = 0;
+
 namespace CMU462 {
 
 	// find the previous HalfedgeIter of a given HalfedgeIter
@@ -282,6 +284,7 @@ void HalfedgeMesh::assignSubdivisionIndices() {
 		i++;
 	}
 	
+	max_i = i;
 	//showError("assignSubdivisionIndices() not implemented.");
 }
 
@@ -293,17 +296,28 @@ void HalfedgeMesh::assignSubdivisionIndices() {
  * and Face::newPosition.
  */
 void HalfedgeMesh::buildSubdivisionVertexList(vector<Vector3D>& subDVertices) {
-  // TODO Resize the vertex list so that it can hold all the vertices.
+	// TODO Resize the vertex list so that it can hold all the vertices.
+	subDVertices.resize(max_i);
 
-  // TODO Iterate over vertices, assigning Vertex::newPosition to the
-  // appropriate location in the new vertex list.
+	// TODO Iterate over vertices, assigning Vertex::newPosition to the
+	// appropriate location in the new vertex list.
+	for (VertexIter x = verticesBegin(); x != verticesEnd(); x++) {
+		subDVertices[x->index] = x->newPosition;
+	} 
 
-  // TODO Iterate over edges, assigning Edge::newPosition to the appropriate
-  // location in the new vertex list.
+	// TODO Iterate over edges, assigning Edge::newPosition to the appropriate
+	// location in the new vertex list.
+	for (EdgeIter x = edgesBegin(); x != edgesEnd(); x++) {
+		subDVertices[x->index] = x->newPosition;
+	}
 
-  // TODO Iterate over faces, assigning Face::newPosition to the appropriate
-  // location in the new vertex list.
-  showError("buildSubdivisionVertexList() not implemented.");
+	// TODO Iterate over faces, assigning Face::newPosition to the appropriate
+	// location in the new vertex list.
+	for (FaceIter x = facesBegin(); x != facesEnd(); x++) {
+		subDVertices[x->index] = x->newPosition;
+	}
+
+	//showError("buildSubdivisionVertexList() not implemented.");
 }
 
 /**
@@ -318,25 +332,35 @@ void HalfedgeMesh::buildSubdivisionVertexList(vector<Vector3D>& subDVertices) {
  * will look like a bowtie.
  */
 void HalfedgeMesh::buildSubdivisionFaceList(vector<vector<Index> >& subDFaces) {
-  // TODO This routine is perhaps the most tricky step in the construction of
-  // a subdivision mesh (second, perhaps, to computing the actual Catmull-Clark
-  // vertex positions).  Basically what you want to do is iterate over faces,
-  // then for each for each face, append N quads to the list (where N is the
-  // degree of the face).  For this routine, it may be more convenient to simply
-  // append quads to the end of the list (rather than allocating it ahead of
-  // time), though YMMV.  You can of course iterate around a face by starting
-  // with its first halfedge and following the "next" pointer until you get
-  // back to the beginning.  The tricky part is making sure you grab the right
-  // indices in the right order---remember that there are indices on vertices,
-  // edges, AND faces of the original mesh.  All of these should get used.  Also
-  // remember that you must have FOUR indices per face, since you are making a
-  // QUAD mesh!
+	// TODO This routine is perhaps the most tricky step in the construction of
+	// a subdivision mesh (second, perhaps, to computing the actual Catmull-Clark
+	// vertex positions).  Basically what you want to do is iterate over faces,
+	// then for each for each face, append N quads to the list (where N is the
+	// degree of the face).  For this routine, it may be more convenient to simply
+	// append quads to the end of the list (rather than allocating it ahead of
+	// time), though YMMV.  You can of course iterate around a face by starting
+	// with its first halfedge and following the "next" pointer until you get
+	// back to the beginning.  The tricky part is making sure you grab the right
+	// indices in the right order---remember that there are indices on vertices,
+	// edges, AND faces of the original mesh.  All of these should get used.  Also
+	// remember that you must have FOUR indices per face, since you are making a
+	// QUAD mesh!
 
-  // TODO iterate over faces
-  // TODO loop around face
-  // TODO build lists of four indices for each sub-quad
-  // TODO append each list of four indices to face list
-  showError("buildSubdivisionFaceList() not implemented.");
+	// TODO iterate over faces
+	// TODO loop around face
+	// TODO build lists of four indices for each sub-quad
+	// TODO append each list of four indices to face list
+	for (FaceIter f = facesBegin(); f != facesEnd(); f++) {
+		HalfedgeIter it = f->halfedge();
+		HalfedgeIter it2 = it->next();
+		do {
+			subDFaces.push_back({ it2->vertex()->index,it2->edge()->index, f->index,it->edge()->index });
+			it = it->next();
+			it2 = it->next();
+		} while (it != f->halfedge());
+	}
+
+	//showError("buildSubdivisionFaceList() not implemented.");
 }
 
 FaceIter HalfedgeMesh::bevelVertex(VertexIter v) {
