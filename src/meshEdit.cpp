@@ -241,18 +241,49 @@ void HalfedgeMesh::computeLinearSubdivisionPositions() {
  * the Catmull-Clark rules for subdivision.
  */
 void HalfedgeMesh::computeCatmullClarkPositions() {
-  // TODO The implementation for this routine should be
-  // a lot like HalfedgeMesh::computeLinearSubdivisionPositions(),
-  // except that the calculation of the positions themsevles is
-  // slightly more involved, using the Catmull-Clark subdivision
-  // rules. (These rules are outlined in the Developer Manual.)
+	// TODO The implementation for this routine should be
+	// a lot like HalfedgeMesh::computeLinearSubdivisionPositions(),
+	// except that the calculation of the positions themsevles is
+	// slightly more involved, using the Catmull-Clark subdivision
+	// rules. (These rules are outlined in the Developer Manual.)
 
-  // TODO face
+	// TODO face
+	for (FaceIter x = facesBegin(); x != facesEnd(); x++) {
+		x->newPosition = x->centroid();
+	}
 
-  // TODO edges
+	// TODO edges
+	for (EdgeIter x = edgesBegin(); x != edgesEnd(); x++) {
+		HalfedgeIter h1 = x->halfedge();
+		HalfedgeIter h2 = h1->twin();
+		Vector3D a = h1->vertex()->position;
+		Vector3D b = h2->vertex()->position;
+		Vector3D c = h1->face()->newPosition;
+		Vector3D d = h2->face()->newPosition;
 
-  // TODO vertices
-  showError("computeCatmullClarkPositions() not implemented.");
+		x->newPosition = (a + b + c + d) / 4.0;
+	}
+
+	// TODO vertices
+	for (VertexIter x = verticesBegin(); x != verticesEnd(); x++) {
+		int n = 0;
+		HalfedgeIter h1 = x->halfedge();
+		Vector3D Q = { 0.0,0.0,0.0 };
+		Vector3D R = { 0.0,0.0,0.0 };
+		Vector3D S = x->position;
+		do {
+			n++;
+			Q += h1->face()->newPosition;
+			R += h1->edge()->centroid();
+			h1 = h1->twin()->next();
+		} while (h1 != x->halfedge());
+		Q /= n;
+		R /= n;
+
+		x->newPosition = (Q + 2 * R + (n - 3)*S) / n;
+	}
+	
+	//showError("computeCatmullClarkPositions() not implemented.");
 }
 
 /**
