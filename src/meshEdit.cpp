@@ -117,12 +117,39 @@ FaceIter HalfedgeMesh::eraseEdge(EdgeIter e) {
 }
 
 EdgeIter HalfedgeMesh::flipEdge(EdgeIter e0) {
-  // TODO: (meshEdit)
-  // This method should flip the given edge and return an iterator to the
-  // flipped edge.
+	// TODO: (meshEdit)
+	// This method should flip the given edge and return an iterator to the
+	// flipped edge.
 
-  showError("flipEdge() not implemented.");
-  return EdgeIter();
+	HalfedgeIter h1 = e0->halfedge();
+	HalfedgeIter h2 = h1->twin();
+	HalfedgeIter h1_next = h1->next();
+	HalfedgeIter h1_next_next = h1->next()->next();
+	HalfedgeIter h2_next = h2->next();
+	HalfedgeIter h2_next_next = h2->next()->next();
+	HalfedgeIter h1_prev = prev_Halfedge(h1);
+	HalfedgeIter h2_prev = prev_Halfedge(h2);
+
+	h1->vertex()->halfedge() = h2_next;
+	h2->vertex()->halfedge() = h1_next;
+	h1->face()->halfedge() = h1;
+	h2->face()->halfedge() = h2;
+
+	h1->vertex() = h2_next_next->vertex();
+	h2->vertex() = h1_next_next->vertex();
+
+	h1->next() = h1_next_next;
+	h1_prev->next() = h2_next;
+	h2_next->next() = h1;
+	h2->next() = h2_next_next;
+	h2_prev->next() = h1_next;
+	h1_next->next() = h2;
+
+	h1_next->face() = h2->face();
+	h2_next->face() = h1->face();
+
+	//showError("flipEdge() not implemented.");
+	return e0;
 }
 
 void HalfedgeMesh::subdivideQuad(bool useCatmullClark) {
