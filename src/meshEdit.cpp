@@ -4,8 +4,6 @@
 #include "mutablePriorityQueue.h"
 #include "error_dialog.h"
 
-Index max_i = 0;
-
 namespace CMU462 {
 
 	// find the previous HalfedgeIter of a given HalfedgeIter
@@ -314,8 +312,7 @@ void HalfedgeMesh::assignSubdivisionIndices() {
 		x->index = i;
 		i++;
 	}
-	
-	max_i = i;
+
 	//showError("assignSubdivisionIndices() not implemented.");
 }
 
@@ -328,7 +325,8 @@ void HalfedgeMesh::assignSubdivisionIndices() {
  */
 void HalfedgeMesh::buildSubdivisionVertexList(vector<Vector3D>& subDVertices) {
 	// TODO Resize the vertex list so that it can hold all the vertices.
-	subDVertices.resize(max_i);
+	Size size = nEdges() + nFaces() + nVertices();
+	subDVertices.resize(size);
 
 	// TODO Iterate over vertices, assigning Vertex::newPosition to the
 	// appropriate location in the new vertex list.
