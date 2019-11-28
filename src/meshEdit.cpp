@@ -17,15 +17,95 @@ namespace CMU462 {
 	}
 
 
-VertexIter HalfedgeMesh::splitEdge(EdgeIter e0) {
-  // TODO: (meshEdit)
-  // This method should split the given edge and return an iterator to the
-  // newly inserted vertex. The halfedge of this vertex should point along
-  // the edge that was split, rather than the new edges.
+	VertexIter HalfedgeMesh::splitEdge(EdgeIter e0) {
+		// TODO: (meshEdit)
+		// This method should split the given edge and return an iterator to the
+		// newly inserted vertex. The halfedge of this vertex should point along
+		// the edge that was split, rather than the new edges.
+		HalfedgeIter h1 = e0->halfedge();
+		HalfedgeIter h2 = h1->twin();
+		FaceIter f1 = h1->face();
+		FaceIter f2 = h2->face();
 
-  showError("splitEdge() not implemented.");
-  return VertexIter();
-}
+		if (f1->degree() > 3 || f2->degree() > 3) return h1->vertex();
+
+		HalfedgeIter h1_next = h1->next();
+		HalfedgeIter h1_prev = h1_next->next();
+		HalfedgeIter h2_next = h2->next();
+		HalfedgeIter h2_prev = h2_next->next();
+
+		VertexIter v1 = h1->vertex();
+		VertexIter v2 = h2->vertex();
+		VertexIter v1_next = h1_prev->vertex();
+		VertexIter v2_next = h2_prev->vertex();
+		VertexIter new_vertex = newVertex();
+
+		EdgeIter new_edge1 = newEdge();
+		EdgeIter new_edge2 = newEdge();
+		EdgeIter new_edge_down = newEdge();
+		FaceIter new_f1 = newFace();
+		FaceIter new_f2 = newFace();
+
+		HalfedgeIter h1_left = newHalfedge();
+		HalfedgeIter h1_right = newHalfedge();
+		HalfedgeIter h2_left = newHalfedge();
+		HalfedgeIter h2_right = newHalfedge();
+		HalfedgeIter h_down_left = newHalfedge();
+		HalfedgeIter h_down_right = newHalfedge();
+
+		new_vertex->position = e0->centroid();
+		new_vertex->halfedge() = h2;
+		v1->halfedge() = h1;
+		v2->halfedge() = h_down_right;
+
+		h1->next() = h1_left;
+		h1_left->next() = h1_prev;
+		h2_next->next() = h2_left;
+		h2->vertex() = new_vertex;
+		h2_left->next() = h2;
+		h1_left->vertex() = new_vertex;
+		h2_left->vertex() = v2_next;
+		h1_left->face() = f1;
+		h2_left->face() = f2;
+		f1->halfedge() = h1;
+		f2->halfedge() = h2;
+		h1_left->edge() = new_edge1;
+		h2_left->edge() = new_edge2;
+		new_edge1->halfedge() = h1_left;
+		new_edge2->halfedge() = h2_left;
+		h1_left->twin() = h1_right;
+		h1_right->twin() = h1_left;
+		h2_left->twin() = h2_right;
+		h2_right->twin() = h2_left;
+		h1_right->edge() = new_edge1;
+		h2_right->edge() = new_edge2;
+		h1_right->vertex() = v1_next;
+		h2_right->vertex() = new_vertex;
+		h1_right->face() = new_f1;
+		h2_right->face() = new_f2;
+		new_f1->halfedge() = h1_right;
+		new_f2->halfedge() = h2_right;
+		h1_right->next() = h_down_left;
+		h2_right->next() = h2_prev;
+		h1_next->next() = h1_right;
+		h1_next->face() = new_f1;
+		h2_prev->next() = h_down_right;
+		h2_prev->face() = new_f2;
+		h_down_left->vertex() = new_vertex;
+		h_down_right->vertex() = v2;
+		h_down_left->twin() = h_down_right;
+		h_down_right->twin() = h_down_left;
+		h_down_left->edge() = new_edge_down;
+		h_down_right->edge() = new_edge_down;
+		new_edge_down->halfedge() = h_down_left;
+		h_down_left->face() = new_f1;
+		h_down_right->face() = new_f2;
+		h_down_left->next() = h1_next;
+		h_down_right->next() = h2_right;
+
+		//showError("splitEdge() not implemented.");
+		return new_vertex;
+	}
 
 VertexIter HalfedgeMesh::collapseEdge(EdgeIter e) {
 	// TODO: (meshEdit)
