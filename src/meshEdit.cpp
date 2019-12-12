@@ -766,14 +766,31 @@ void HalfedgeMesh::splitPolygon(FaceIter f) {
 EdgeRecord::EdgeRecord(EdgeIter& _edge) : edge(_edge) {
 	// TODO: (meshEdit)
 	// Compute the combined quadric from the edge endpoints.
+	Matrix4x4 q = edge->halfedge()->vertex()->quadric;
+	q += edge->halfedge()->twin()->vertex()->quadric;
+
 	// -> Build the 3x3 linear system whose solution minimizes the quadric error
 	//    associated with these two endpoints.
+	Matrix3x3 A ;
+	A(0, 0) = q(0, 0);
+	A(0, 1) = q(0, 1);
+	A(0, 2) = q(0, 2);
+	A(1, 0) = q(1, 0);
+	A(1, 1) = q(1, 1);
+	A(1, 2) = q(1, 2);
+	A(2, 0) = q(2, 0);
+	A(2, 1) = q(2, 1);
+	A(2, 2) = q(2, 2);
+	Vector3D b (q(0,3), q(1, 3), q(2, 3));
+
 	// -> Use this system to solve for the optimal position, and store it in
 	//    EdgeRecord::optimalPoint.
+	optimalPoint = A.inv()*b;
+
 	// -> Also store the cost associated with collapsing this edg in
 	//    EdgeRecord::Cost.
-
-
+	Vector4D x(optimalPoint, 1);
+	score = dot(x , q*x);
 }
 
 void MeshResampler::upsample(HalfedgeMesh& mesh)
