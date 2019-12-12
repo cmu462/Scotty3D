@@ -946,11 +946,55 @@ void MeshResampler::downsample(HalfedgeMesh& mesh) {
 	//    the collapsed vertex AFTER it's been collapsed. Also remember to assign
 	//    a quadric to the collapsed vertex, and to pop the collapsed edge off the
 	//    top of the queue.
+	int n = mesh.nEdges();
+	int target = n / 4;
+	for (; n > target; n--) {
+		EdgeRecord er = queue.top();
+		queue.pop();
+		EdgeIter temp, e = er.edge;
 
+		// Compute the combined quadric from the edge endpoints.
+		VertexIter v1 = e->halfedge()->vertex();
+		VertexIter v2 = e->halfedge()->twin()->vertex();
+		Matrix4x4 q = v1->quadric;
+		q += v2->quadric;
 
+		// remove from the queue any edge that touches the collapsing edge
+		// BEFORE it gets collapsed
+		vector<EdgeIter> buffer;
+		HalfedgeIter h = v1->halfedge();
+		do {
+			temp = h->edge();
+			if (temp != e) {
+				buffer.push_back(temp);
+				queue.remove(temp->record);
+			}
+			h = h->twin()->next();
+		}while (h != v1->halfedge());
+		
+		h = v2->halfedge();
+		do {
+			temp = h->edge();
+			if (temp != e) {
+				buffer.push_back(temp);
+				queue.remove(temp->record);
+			}
+			h = h->twin()->next();
+		} while (h != v1->halfedge());
 
+		// assign a quadric to the collapsed vertex
+		VertexIter new_v = mesh.collapseEdge(e);
+		new_v->position = er.optimalPoint;
+		new_v->quadric = q;
 
-	  //showError("downsample() not implemented.");
+		// add back into the queue any edge touching
+		// the collapsed vertex AFTER it's been collapsed.
+		for (EdgeIter e2 : buffer) {
+			e2->record = EdgeRecord(e2);
+			queue.insert(e2->record);
+		}
+	}
+	//showError("downsample() not implemented.");
 }
 
 void MeshResampler::resample(HalfedgeMesh& mesh) {
