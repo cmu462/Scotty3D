@@ -994,17 +994,35 @@ void MeshResampler::downsample(HalfedgeMesh& mesh) {
 }
 
 void MeshResampler::resample(HalfedgeMesh& mesh) {
-  // TODO: (meshEdit)
-  // Compute the mean edge length.
-  // Repeat the four main steps for 5 or 6 iterations
-  // -> Split edges much longer than the target length (being careful about
-  //    how the loop is written!)
-  // -> Collapse edges much shorter than the target length.  Here we need to
-  //    be EXTRA careful about advancing the loop, because many edges may have
-  //    been destroyed by a collapse (which ones?)
-  // -> Now flip each edge if it improves vertex degree
-  // -> Finally, apply some tangential smoothing to the vertex positions
-  showError("resample() not implemented.");
+	// TODO: (meshEdit)
+	// Compute the mean edge length.
+	double L = 0.0;
+	for (EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++) {
+		L += e->length();
+	}
+	L /= mesh.nEdges();
+
+	// Repeat the four main steps for 5 or 6 iterations
+	for (int i = 0; i < 6; i++) {
+		// -> Split edges much longer than the target length (being careful about
+		//    how the loop is written!)
+		EdgeIter e_start = mesh.edgesBegin();
+		EdgeIter e_end = mesh.edgesEnd();
+		for (EdgeIter e = e_start; e != e_end; e++) {
+			if (e->length() > 4.0*L / 3.0) mesh.splitEdge(e);
+		}
+
+		// -> Collapse edges much shorter than the target length.  Here we need to
+		//    be EXTRA careful about advancing the loop, because many edges may have
+		//    been destroyed by a collapse (which ones?)
+		for (EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++) {
+			if (e->length() < 4.0*L / 5.0) mesh.collapseEdge(e);
+		}
+
+		// -> Now flip each edge if it improves vertex degree
+		// -> Finally, apply some tangential smoothing to the vertex positions
+	}
+	//showError("resample() not implemented.");
 }
 
 }  // namespace CMU462
