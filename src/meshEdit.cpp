@@ -781,7 +781,7 @@ EdgeRecord::EdgeRecord(EdgeIter& _edge) : edge(_edge) {
 	A(2, 0) = q(2, 0);
 	A(2, 1) = q(2, 1);
 	A(2, 2) = q(2, 2);
-	Vector3D b (q(0,3), q(1, 3), q(2, 3));
+	Vector3D b (-q(0,3), -q(1, 3), -q(2, 3));
 
 	// -> Use this system to solve for the optimal position, and store it in
 	//    EdgeRecord::optimalPoint.
@@ -947,9 +947,8 @@ void MeshResampler::downsample(HalfedgeMesh& mesh) {
 	//    the collapsed vertex AFTER it's been collapsed. Also remember to assign
 	//    a quadric to the collapsed vertex, and to pop the collapsed edge off the
 	//    top of the queue.
-	int n = mesh.nEdges();
-	int target = n / 4;
-	for (; n > target; n--) {
+	int target = mesh.nEdges() / 4;
+	while(mesh.nEdges() > target){
 		EdgeRecord er = queue.top();
 		queue.pop();
 		EdgeIter temp, e = er.edge;
