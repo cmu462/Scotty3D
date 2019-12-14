@@ -788,7 +788,7 @@ EdgeRecord::EdgeRecord(EdgeIter& _edge) : edge(_edge) {
 	optimalPoint = A.inv()*b;
 
 	// -> Also store the cost associated with collapsing this edg in
-	//    EdgeRecord::Cost.
+	//    EdgeRecord::Cost
 	Vector4D x(optimalPoint, 1);
 	score = dot(x , q*x);
 }
@@ -914,6 +914,7 @@ void MeshResampler::downsample(HalfedgeMesh& mesh) {
 	// in Face::quadric
 	for (FaceIter f = mesh.facesBegin(); f != mesh.facesEnd(); f++) {
 		Vector3D N = f->normal(); // (a,b,c)
+		N = N.unit();
 		Vector3D p = f->halfedge()->vertex()->position;
 		double d = -dot(N, p);
 		Vector4D v(N, d); // (a,b,c,d)
@@ -961,26 +962,19 @@ void MeshResampler::downsample(HalfedgeMesh& mesh) {
 
 		// remove from the queue any edge that touches the collapsing edge
 		// BEFORE it gets collapsed
-		vector<EdgeIter> buffer;
 		HalfedgeIter h = v1->halfedge();
 		do {
 			temp = h->edge();
-			if (temp != e) {
-				buffer.push_back(temp);
-				queue.remove(temp->record);
-			}
+			if (temp != e) queue.remove(temp->record);
 			h = h->twin()->next();
 		}while (h != v1->halfedge());
 		
 		h = v2->halfedge();
 		do {
 			temp = h->edge();
-			if (temp != e) {
-				buffer.push_back(temp);
-				queue.remove(temp->record);
-			}
+			if (temp != e) queue.remove(temp->record);
 			h = h->twin()->next();
-		} while (h != v1->halfedge());
+		} while (h != v2->halfedge());
 
 		// assign a quadric to the collapsed vertex
 		VertexIter new_v = mesh.collapseEdge(e);
@@ -989,10 +983,13 @@ void MeshResampler::downsample(HalfedgeMesh& mesh) {
 
 		// add back into the queue any edge touching
 		// the collapsed vertex AFTER it's been collapsed.
-		for (EdgeIter e2 : buffer) {
-			e2->record = EdgeRecord(e2);
-			queue.insert(e2->record);
-		}
+		h = new_v->halfedge();
+		do {
+			temp = h->edge();
+			temp->record = EdgeRecord(temp);
+			queue.insert(temp->record);
+			h = h->twin()->next();
+		} while (h != new_v->halfedge());
 	}
 	//showError("downsample() not implemented.");
 }
