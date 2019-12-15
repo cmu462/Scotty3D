@@ -1003,7 +1003,7 @@ void MeshResampler::resample(HalfedgeMesh& mesh) {
 	L /= mesh.nEdges();
 
 	// Repeat the four main steps for 5 or 6 iterations
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 5; i++) {
 		// -> Split edges much longer than the target length (being careful about
 		//    how the loop is written!)
 		EdgeIter e_start = mesh.edgesBegin();
@@ -1015,12 +1015,68 @@ void MeshResampler::resample(HalfedgeMesh& mesh) {
 		// -> Collapse edges much shorter than the target length.  Here we need to
 		//    be EXTRA careful about advancing the loop, because many edges may have
 		//    been destroyed by a collapse (which ones?)
-		for (EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++) {
-			if (e->length() < 4.0*L / 5.0) mesh.collapseEdge(e);
+		EdgeIter e = mesh.edgesBegin();
+		EdgeIter e_next = e;
+		bool keep_going = true;
+		while (keep_going){
+			if (e->length() < 4.0*L / 5.0) {
+				HalfedgeIter halfedge1 = e->halfedge();
+				HalfedgeIter halfedge2 = e->halfedge()->twin();
+				EdgeIter deleted_edge_1 = halfedge1->next()->next()->edge();
+				EdgeIter deleted_edge_2 = halfedge2->next()->next()->edge();
+
+				e_next = e;
+				e_next++;
+				while (e_next == deleted_edge_1 || e_next == deleted_edge_2) e_next++;
+				if (e_next == mesh.edgesEnd()) keep_going = false;
+				mesh.collapseEdge(e);
+				e = e_next;
+			}
+			else {
+				e++;
+				if (e == mesh.edgesEnd()) keep_going = false;
+			}
 		}
 
+		/*vector<EdgeIter> buffer;
+		for (EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++) {
+			if (e->length() < 4.0*L / 5.0) buffer.push_back(e); 
+		}
+		for (EdgeIter e: buffer) mesh.collapseEdge(e);*/
+
+		/*EdgeIter e = mesh.edgesBegin();
+		EdgeIter e_next = e;
+		for (int i = 0; i < mesh.nEdges();i++) {
+			e_next++;
+			if (e->length() < 4.0*L / 5.0) mesh.collapseEdge(e);
+			e = e_next;
+		}*/
+
 		// -> Now flip each edge if it improves vertex degree
+		for (EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++) {
+			int a1 = e->halfedge()->vertex()->degree();
+			int a2 = e->halfedge()->twin()->vertex()->degree();
+			int b1 = e->halfedge()->next()->next()->vertex()->degree();
+			int b2 = e->halfedge()->twin()->next()->next()->vertex()->degree();
+			int before = abs(a1 - 6) + abs(a2 - 6) + abs(b1 - 6) + abs(b2 - 6);
+			int after = abs(a1 - 1 - 6) + abs(a2 - 1 - 6) + abs(b1 + 1 - 6) + abs(b2 + 1 - 6);
+			if (after < before) mesh.flipEdge(e);
+		}
+
 		// -> Finally, apply some tangential smoothing to the vertex positions
+		for (VertexIter ver = mesh.verticesBegin(); ver != mesh.verticesEnd(); ver++) {
+			double w = 1.0 / 5.0;
+			Vector3D N = ver->normal();
+			Vector3D c = ver->centroid();
+			Vector3D p = ver->position;
+			Vector3D v = c - p;
+			v = v - dot(N, v);
+			ver->newPosition = p + w * v;
+		}
+		for (VertexIter ver = mesh.verticesBegin(); ver != mesh.verticesEnd(); ver++) {
+			ver->position = ver->newPosition;
+		}
+
 	}
 	//showError("resample() not implemented.");
 }
