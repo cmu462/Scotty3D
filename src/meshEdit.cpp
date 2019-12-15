@@ -1006,16 +1006,23 @@ void MeshResampler::resample(HalfedgeMesh& mesh) {
 	for (int i = 0; i < 5; i++) {
 		// -> Split edges much longer than the target length (being careful about
 		//    how the loop is written!)
-		EdgeIter e_start = mesh.edgesBegin();
+		int n = mesh.nEdges();
+		EdgeIter e = mesh.edgesBegin();
+		for (int i = 0; i < n; i++) {
+			if (e->length() > 4.0*L / 3.0) mesh.splitEdge(e);
+			e++;
+		}
+		/*EdgeIter e_start = mesh.edgesBegin();
 		EdgeIter e_end = mesh.edgesEnd();
 		for (EdgeIter e = e_start; e != e_end; e++) {
 			if (e->length() > 4.0*L / 3.0) mesh.splitEdge(e);
-		}
+		}*/
 
 		// -> Collapse edges much shorter than the target length.  Here we need to
 		//    be EXTRA careful about advancing the loop, because many edges may have
 		//    been destroyed by a collapse (which ones?)
-		EdgeIter e = mesh.edgesBegin();
+		e = mesh.edgesBegin();
+		//EdgeIter e = mesh.edgesBegin();
 		EdgeIter e_next = e;
 		bool keep_going = true;
 		while (keep_going){
