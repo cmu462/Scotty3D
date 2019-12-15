@@ -441,7 +441,7 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
     float dist_to_light;
     float pr;
 
-    // ### Estimate direct lighting integral
+    // ### Estimate direct lighting integral.
     for (SceneLight* light : scene->lights) {
 
       // no need to take multiple samples from a point/directional source
