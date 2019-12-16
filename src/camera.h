@@ -86,6 +86,10 @@ class Camera {
    */
   Ray generate_ray(double x, double y) const;
 
+  // my own function
+  size_t get_screenW() const { return screenW; }
+  size_t get_screenH() const { return screenH; }
+
  private:
   // Computes pos, screenXDir, screenYDir from target, r, phi, theta.
   void compute_position();

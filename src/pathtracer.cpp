@@ -24,7 +24,7 @@ using std::max;
 
 namespace CMU462 {
 
-// #define ENABLE_RAY_LOGGING 1
+ #define ENABLE_RAY_LOGGiNG 1
 
 PathTracer::PathTracer(size_t ns_aa, size_t max_ray_depth, size_t ns_area_light,
                        size_t ns_diff, size_t ns_glsy, size_t ns_refr,
@@ -441,7 +441,8 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
     float dist_to_light;
     float pr;
 
-    // ### Estimate direct lighting integral.
+    // ### Estimate direct lighting integral
+
     for (SceneLight* light : scene->lights) {
 
       // no need to take multiple samples from a point/directional source
@@ -503,7 +504,13 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
 
   int num_samples = ns_aa;
 
-  Vector2D p = Vector2D(0.5, 0.5);
+  size_t screenW = camera->get_screenW();
+  size_t screenH = camera->get_screenH();
+
+  UniformGridSampler2D sampler;
+  Vector2D a = sampler.get_sample();
+
+  Vector2D p = Vector2D(x / double(screenW), y / double(screenH));
   return trace_ray(camera->generate_ray(p.x, p.y));
 }
 
