@@ -509,15 +509,18 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
 
 	if (num_samples == 1) {
 		Vector2D p = Vector2D((double(x)+0.5) / w, (double(y)+0.5) / h);
-		return trace_ray(camera->generate_ray(p.x, p.y));
+		return trace_ray(camera->generate_ray(p.x-0.5, p.y-0.5));
 	}
 	else {
 		UniformGridSampler2D sampler;
 		Vector2D p;
+		double a1, a2;
 		Spectrum result(0, 0, 0);
 		for (int i = 0; i < num_samples; i++) {
 			p = sampler.get_sample();
-			result += trace_ray(camera->generate_ray((double(x) + p.x) / w, (double(y) + p.y) / h));
+			a1 = (double(x) + p.x) / w;
+			a2 = (double(y) + p.y) / h;
+			result += trace_ray(camera->generate_ray(a1 - 0.5, a2 - 0.5));
 		}
 
 		return result;

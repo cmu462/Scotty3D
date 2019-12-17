@@ -8,7 +8,6 @@ namespace CMU462 {
 		// TODO (PathTracer):
 		// Implement uniform 2D grid sampler
 
-
 		return Vector2D(double(rand()) / RAND_MAX, double(rand()) / RAND_MAX);
 	}
 
