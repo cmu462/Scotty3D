@@ -394,12 +394,13 @@ void PathTracer::key_press(int key) {
 
 Spectrum PathTracer::trace_ray(const Ray &r) {
   Intersection isect;
-  log_ray_miss(r); // DELETE THAT THING!!!!!
+  //log_ray_miss(r); // DELETE THAT THING!!!!!
   if (!bvh->intersect(r, &isect)) {
 // log ray miss
-#ifdef ENABLE_RAY_LOGGING
-    log_ray_miss(r);
-#endif
+//#ifdef ENABLE_RAY_LOGGING
+//    log_ray_miss(r);
+//#endif
+	if (ENABLE_RAY_LOGGiNG) log_ray_miss(r);
 
     // TODO (PathTracer):
     // (Task 7) If you have an environment map, return the Spectrum this ray
@@ -408,9 +409,10 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
   }
 
 // log ray hit
-#ifdef ENABLE_RAY_LOGGING
-  log_ray_hit(r, isect.t);
-#endif
+//#ifdef ENABLE_RAY_LOGGING
+//  log_ray_hit(r, isect.t);
+//#endif
+  if (ENABLE_RAY_LOGGiNG) log_ray_hit(r, isect.t);
 
   Spectrum L_out = isect.bsdf->get_emission();  // Le
 

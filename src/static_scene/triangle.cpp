@@ -19,16 +19,64 @@ BBox Triangle::get_bbox() const {
 
 bool Triangle::intersect(const Ray& r) const {
   // TODO (PathTracer): implement ray-triangle intersection
+	Vector3D o = r.o;
+	Vector3D d = r.d;
+	Vector3D p0 = mesh->positions[v1];
+	Vector3D p1 = mesh->positions[v2];
+	Vector3D p2 = mesh->positions[v3];
 
-  return false;
+	Vector3D e1 = p1 - p0;
+	Vector3D e2 = p2 - p0;
+	Vector3D s = o - p0;
+
+	Vector3D e1xd = cross(e1, d);
+	double det = dot(e1xd,e2);
+	if (det < 0.00001) return false;
+
+	Vector3D sxe2 = cross(s, e2);
+	double u = -dot(sxe2, d) / det;
+	if (u < 0.0 || u > 1.0) return false;
+
+	double v = dot(e1xd, s) / det;
+	if (v < 0.0 || u + v > 1.0) return false;
+
+	return true;
 }
 
 bool Triangle::intersect(const Ray& r, Intersection* isect) const {
-  // TODO (PathTracer):
-  // implement ray-triangle intersection. When an intersection takes
-  // place, the Intersection data should be updated accordingly
+	// TODO (PathTracer):
+	// implement ray-triangle intersection. When an intersection takes
+	// place, the Intersection data should be updated accordingly
 
-  return false;
+	Vector3D o = r.o;
+	Vector3D d = r.d;
+	Vector3D p0 = mesh->positions[v1];
+	Vector3D p1 = mesh->positions[v2];
+	Vector3D p2 = mesh->positions[v3];
+
+	Vector3D e1 = p1 - p0;
+	Vector3D e2 = p2 - p0;
+	Vector3D s = o - p0;
+
+	Vector3D e1xd = cross(e1, d);
+	double det = dot(e1xd, e2);
+	if (det < 0.00001) return false;
+
+	Vector3D sxe2 = cross(s, e2);
+	double u = -dot(sxe2, d) / det;
+	if (u < 0.0 || u > 1.0) return false;
+
+	double v = dot(e1xd, s) / det;
+	if (v < 0.0 || u + v > 1.0) return false;
+
+	isect->t = -dot(sxe2, e1) / det;
+	isect->n = (1.0 - u - v) * mesh->normals[v1] + u * mesh->normals[v2] + v * mesh->normals[v3];
+	isect->bsdf = mesh->get_bsdf();
+	isect->primitive = this;
+
+	if (dot(isect->n, d) > 0.0) isect->n = -isect->n;
+
+	return true;
 }
 
 void Triangle::draw(const Color& c) const {
