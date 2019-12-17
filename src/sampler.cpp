@@ -9,7 +9,7 @@ namespace CMU462 {
 		// Implement uniform 2D grid sampler
 
 
-		return Vector2D(rand() / RAND_MAX, rand() / RAND_MAX);
+		return Vector2D(double(rand()) / RAND_MAX, double(rand()) / RAND_MAX);
 	}
 
 // Uniform Hemisphere Sampler3D Implementation //
