@@ -394,7 +394,7 @@ void PathTracer::key_press(int key) {
 
 Spectrum PathTracer::trace_ray(const Ray &r) {
   Intersection isect;
-
+  log_ray_miss(r); // DELETE THAT THING!!!!!
   if (!bvh->intersect(r, &isect)) {
 // log ray miss
 #ifdef ENABLE_RAY_LOGGING
@@ -498,20 +498,30 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
 }
 
 Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
-  // TODO (PathTracer):
-  // Sample the pixel with coordinate (x,y) and return the result spectrum.
-  // The sample rate is given by the number of camera rays per pixel.
+	// TODO (PathTracer):
+	// Sample the pixel with coordinate (x,y) and return the result spectrum.
+	// The sample rate is given by the number of camera rays per pixel.
 
-  int num_samples = ns_aa;
+	int num_samples = ns_aa;
 
-  size_t screenW = camera->get_screenW();
-  size_t screenH = camera->get_screenH();
+	size_t w = sampleBuffer.w;
+	size_t h = sampleBuffer.h;
 
-  UniformGridSampler2D sampler;
-  Vector2D a = sampler.get_sample();
+	if (num_samples == 1) {
+		Vector2D p = Vector2D((double(x)+0.5) / w, (double(y)+0.5) / h);
+		return trace_ray(camera->generate_ray(p.x, p.y));
+	}
+	else {
+		UniformGridSampler2D sampler;
+		Vector2D p;
+		Spectrum result(0, 0, 0);
+		for (int i = 0; i < num_samples; i++) {
+			p = sampler.get_sample();
+			result += trace_ray(camera->generate_ray((double(x) + p.x) / w, (double(y) + p.y) / h));
+		}
 
-  Vector2D p = Vector2D(x / double(screenW), y / double(screenH));
-  return trace_ray(camera->generate_ray(p.x, p.y));
+		return result;
+	}
 }
 
 void PathTracer::raytrace_tile(int tile_x, int tile_y, int tile_w, int tile_h) {

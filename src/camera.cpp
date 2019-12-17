@@ -119,12 +119,30 @@ Matrix4x4 Camera::getTransformation() {
   return (retmul * ret).inv();
 }
 
-Ray Camera::generate_ray(double x, double y) const {
-  // TODO (PathTracer):
-  // compute position of the input sensor sample coordinate on the
-  // canonical sensor plane one unit away from the pinhole.
+Ray Camera::generate_ray(double x, double y) {
+	// TODO (PathTracer):
+	// compute position of the input sensor sample coordinate on the
+	// canonical sensor plane one unit away from the pinhole.
+	x -= 0.5;
+	y -= 0.5;
 
-  return Ray(Vector3D(0, 0, 0), Vector3D(0, 0, 1));
+	double H = 1.0*tan(v_fov() / 2);
+	double W = aspect_ratio() * H;
+
+	x = x / 0.5* W;
+	y = y / 0.5* H;
+
+	Matrix4x4 trans = getTransformation();
+	Vector3D origin(0, 0, 0);
+	origin = trans * origin;
+
+	Vector3D p(x, y, -1);
+	p = trans * p;
+
+	Vector3D direction = p - origin;
+	direction.unit();
+
+	return Ray(origin, direction);
 }
 
 }  // namespace CMU462

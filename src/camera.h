@@ -84,7 +84,7 @@ class Camera {
    * \param x x-coordinate of the ray sample in the view plane
    * \param y y-coordinate of the ray sample in the view plane
    */
-  Ray generate_ray(double x, double y) const;
+  Ray generate_ray(double x, double y);
 
   // my own function
   size_t get_screenW() const { return screenW; }
