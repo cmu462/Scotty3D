@@ -254,6 +254,7 @@ class PathTracer {
   std::stack<BVHNode*> selectionHistory;  ///< node selection history
   std::vector<LoggedRay> rayLog;          ///< ray tracing log
   bool show_rays;                         ///< show rays from raylog
+  bool show_hitting_rays;				///< show rays hitting the object only from raylog (added by me)
 };
 
 }  // namespace CMU462

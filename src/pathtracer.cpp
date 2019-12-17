@@ -51,6 +51,7 @@ PathTracer::PathTracer(size_t ns_aa, size_t max_ray_depth, size_t ns_area_light,
   hemisphereSampler = new UniformHemisphereSampler3D();
 
   show_rays = true;
+  show_hitting_rays = false;
 
   imageTileSize = 32;
   numWorkerThreads = num_threads;
@@ -330,6 +331,8 @@ void PathTracer::visualize_accel() const {
       const static double VERY_LONG = 10e4;
       double ray_t = VERY_LONG;
 
+	  if (!show_hitting_rays && rayLog[i].hit_t < 0.0) continue;
+
       // color rays that are hits yellow
       // and rays this miss all geometry red
       if (rayLog[i].hit_t >= 0.0) {
@@ -384,8 +387,11 @@ void PathTracer::key_press(int key) {
       }
       break;
     case 's':
+		show_rays = !show_rays;
+		break;
     case 'S':
-      show_rays = !show_rays;
+		show_hitting_rays = !show_hitting_rays;
+		break;
     default:
       return;
   }
