@@ -16,11 +16,11 @@ namespace StaticScene {
 		Vector3D distance = ray.o - o;
 		double projection = dot(distance, ray.d);
 		Vector3D perpendicular = distance - projection * ray.d;
-		if (perpendicular.norm() > r) return false;
+		if (perpendicular.norm2() > r2) return false;
 
 		double a = dot(ray.d, ray.d);
 		double b = 2 * dot(distance, ray.d);
-		double c = dot(distance, distance) - r * r;
+		double c = dot(distance, distance) - r2;
 
 		t2 = (-b + sqrt(b*b - 4 * a*c)) / 2 / a;
 		t1 = (-b - sqrt(b*b - 4 * a*c)) / 2 / a;

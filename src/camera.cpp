@@ -140,9 +140,8 @@ Ray Camera::generate_ray(double x, double y) {
 	p = trans * p;
 
 	Vector3D direction = p - origin;
-	direction.unit();
 
-	return Ray(origin, direction);
+	return Ray(origin, direction.unit());
 }
 
 }  // namespace CMU462

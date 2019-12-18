@@ -78,6 +78,7 @@ bool Triangle::intersect(const Ray& r, Intersection* isect) const {
 
 	isect->t = t;
 	isect->n = (1.0 - u - v) * mesh->normals[v1] + u * mesh->normals[v2] + v * mesh->normals[v3];
+	isect->n = isect->n.unit();
 	isect->bsdf = mesh->get_bsdf();
 	isect->primitive = this;
 
