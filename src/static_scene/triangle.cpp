@@ -40,6 +40,10 @@ bool Triangle::intersect(const Ray& r) const {
 	double v = dot(e1xd, s) / det;
 	if (v < 0.0 || u + v > 1.0) return false;
 
+	double t = -dot(sxe2, e1) / det;
+	if (t > r.max_t || t < r.min_t) return false;
+
+	r.max_t = t;
 	return true;
 }
 
