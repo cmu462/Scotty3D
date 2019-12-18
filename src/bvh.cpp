@@ -17,7 +17,7 @@ namespace StaticScene {
 	// index = indexes of primitives that belonged to this part of tree
 	BVHNode* BVHAccel::build_tree(const std::vector<Primitive *> & _primitives, std::vector<int> & index, size_t max_leaf_size) {
 		
-		int B = 16; // number of regions to split
+		int B = 8; // number of buckets to split
 		
 		// create root node with all primitives
 		BBox bb;
@@ -38,6 +38,14 @@ namespace StaticScene {
 
 		// if not leaf node, start spliting the space using 
 		// method discussed in lecture 15
+		int best_split = 0, best_direction = 0;
+		int temp_cost, best_cost = INF_D;
+		double SN = bb.surface_area(); // total surface area
+		double SA, SB; // surface area of two splits
+		int NA, NB; // number of primitives in the two region
+		double Ctrav = 0.0; // cost of traversing into next branch
+		double Cisect = 1.0; // cost of ray-primitive intersection
+
 		for (int direction = 0; direction < 3; direction++) {
 			std::vector<std::vector<int>> bucket_index(B);
 			std::vector<BBox> bucket_box(B);
@@ -47,8 +55,8 @@ namespace StaticScene {
 			double max_coord = bb.max[direction];
 			double interval = (max_coord - min_coord) / B;
 
-			// insert every primitive into specific bucket at 
-			// each axis
+			// insert every primitive into specific bucket 
+			// in every possible direction
 			int bucket;
 			Vector3D centroid;
 			BBox temp_box;
@@ -63,17 +71,50 @@ namespace StaticScene {
 			// For each of the B-1 possible partitioning planes 
 			// that cuts the B number of buckets, evaluate SAH to find
 			// the best split
-			int best_split = 0;
-			int best_cost = INF_D;
-			double SN = bb.surface_area(); // total surface area
-			double SA,SB; // surface area of two splits
-			int NA, NB; // number of primitives in the two region
-			double Ctrav = 0.0; // cost of traversing into next branch
-			double Cisect = 1.0; // cost of ray-primitive intersection
 			for (int b = 1; b < B; b++) {
+				NA = 0; 
+				NB = 0;
+				BBox lbox, rbox;
+				for (int left = 0; left < b; left++) {
+					NA += bucket_index[left].size();
+					lbox.expand(bucket_box[left]);
+				}
+				for (int right = b; right < B; right++) {
+					NB += bucket_index[right].size();
+					rbox.expand(bucket_box[right]);
+				}
+				SA = lbox.surface_area();
+				SB = rbox.surface_area();
 
+				temp_cost = Ctrav + SA / SN * NA*Cisect + SB / SN * NA*Cisect;
+				if (temp_cost < best_cost) {
+					best_cost = temp_cost;
+					best_split = b;
+					best_direction = direction;
+				}
 			}
 		}
+
+		// partition the primitives using cut method 
+		// that results in the lowest cost
+		double min_coord = bb.min[best_direction];
+		double max_coord = bb.max[best_direction];
+		double limit = (max_coord - min_coord) / B * best_split;
+		std::vector<int> left_index;
+		std::vector<int> right_index;
+		Vector3D centroid;
+		BBox temp_box;
+		for (int i : index) {
+			temp_box = _primitives[i]->get_bbox();
+			centroid = temp_box.centroid();
+			if (centroid[best_direction] >= limit) right_index.push_back(i);
+			else left_index.push_back(i);
+		}
+
+		// call itself recursively to build the left 
+		// and right subtrees
+		root->l = build_tree(_primitives, left_index, max_leaf_size);
+		root->r = build_tree(_primitives, right_index, max_leaf_size);
 		return root;
 	}
 
