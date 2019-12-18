@@ -116,6 +116,11 @@ class BVHAccel : public Aggregate {
 
  private:
   BVHNode* root;  ///< root node of the BVH
+
+  // build the BVH tree using discussed in lecture 15
+  // This function is called recursively
+  // returns the root of the tree/sub-tree
+  BVHNode* build_tree(const std::vector<Primitive *> &_primitives, std::vector<int> & index, size_t max_leaf_size);
 };
 
 }  // namespace StaticScene
