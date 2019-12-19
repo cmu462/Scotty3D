@@ -168,20 +168,39 @@ bool BVHAccel::intersect(const Ray &ray) const {
   return hit;
 }
 
+	// called recursivly to check if the ray is intersecting
+	// the given BVH node. If there is hit, return the hit information
+	// to the primitive closed to the ray
+bool BVHAccel::find_closest_hit(const Ray &ray, BVHNode* node, Intersection *isect) const {
+	if (node == NULL) return false;
+
+	double t0, t1;
+	bool hit = node->bb.intersect(ray, t0, t1);
+	if (!hit) return false;
+
+	if (node->isLeaf()) {
+		hit = false;
+		for (size_t p = node->start; p < node->start + node->range; ++p) {
+			hit = hit | primitives[p]->intersect(ray, isect);
+		}
+		return hit;
+	}
+	else {
+		hit = find_closest_hit(ray, node->l, isect);
+		hit = hit | find_closest_hit(ray, node->r, isect);
+		return hit;
+	}
+}
+
 bool BVHAccel::intersect(const Ray &ray, Intersection *isect) const {
-  // TODO (PathTracer):
-  // Implement ray - bvh aggregate intersection test. A ray intersects
-  // with a BVH aggregate if and only if it intersects a primitive in
-  // the BVH that is not an aggregate. When an intersection does happen.
-  // You should store the non-aggregate primitive in the intersection data
-  // and not the BVH aggregate itself.
+	// TODO (PathTracer):
+	// Implement ray - bvh aggregate intersection test. A ray intersects
+	// with a BVH aggregate if and only if it intersects a primitive in
+	// the BVH that is not an aggregate. When an intersection does happen.
+	// You should store the non-aggregate primitive in the intersection data
+	// and not the BVH aggregate itself.
 
-  bool hit = false;
-  for (size_t p = 0; p < primitives.size(); ++p) {
-    if (primitives[p]->intersect(ray, isect)) hit = true;
-  }
-
-  return hit;
+	return find_closest_hit(ray, root, isect);
 }
 
 }  // namespace StaticScene

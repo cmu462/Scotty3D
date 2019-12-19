@@ -86,6 +86,8 @@ bool Triangle::intersect(const Ray& r, Intersection* isect) const {
 	double t = -dot(sxe2, e1) / det;
 	if (t > r.max_t || t < r.min_t) return false;
 
+	r.max_t = t;
+
 	isect->t = t;
 	isect->n = (1.0 - u - v) * mesh->normals[v1] + u * mesh->normals[v2] + v * mesh->normals[v3];
 	isect->n = isect->n.unit();
@@ -93,8 +95,6 @@ bool Triangle::intersect(const Ray& r, Intersection* isect) const {
 	isect->primitive = this;
 
 	if (dot(isect->n, d) > 0.0) isect->n = -isect->n;
-
-	r.max_t = t;
 
 	return true;
 }
