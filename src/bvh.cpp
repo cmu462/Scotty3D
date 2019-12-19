@@ -14,32 +14,18 @@ namespace StaticScene {
 	// build the BVH tree using discussed in lecture 15
 	// This function is called recursively
 	// returns the root of the tree/sub-tree
-	// index = indexes of primitives that belonged to this part of tree
-	BVHNode* BVHAccel::build_tree(const std::vector<Primitive *> & _primitives, std::vector<int> & index, size_t max_leaf_size) {
+	// changes the order of items in _primitives
+	BVHNode* BVHAccel::build_tree(std::vector<Primitive *> &_primitives, size_t start, size_t range, size_t max_leaf_size) {
 
 		int B = 8; // number of buckets to split
-		
+
 		// create root node with all primitives
 		BBox bb;
-		for (int i : index) bb.expand(primitives[i]->get_bbox());
-		BVHNode* result = new BVHNode(bb, index[0], index.size());
+		for (size_t i = start; i < start + range; i++) bb.expand(_primitives[i]->get_bbox());
+		BVHNode* result = new BVHNode(bb, start, range);
 
 		// check for ending condition
-		if (index.size() == 2 && index[1] - index[0] != 1) {
-			result->l = build_tree(_primitives, std::vector<int>{index[0]}, max_leaf_size);
-			result->r = build_tree(_primitives, std::vector<int>{index[1]}, max_leaf_size);
-			return result;
-		}
-		if (index.size() <= max_leaf_size) {
-			bool is_consecutive = true;
-			for (int i = 1; i < index.size(); i++) {
-				if (index[i] - index[i - 1] != 1) {
-					is_consecutive = false;
-					break;
-				}
-			}
-			if (is_consecutive) return result;
-		}
+		if (range <= max_leaf_size) return result;
 
 		// if not leaf node, start spliting the space using 
 		// method discussed in lecture 15
@@ -51,32 +37,32 @@ namespace StaticScene {
 		double Ctrav = 0.0; // cost of traversing into next branch
 		double Cisect = 1.0; // cost of ray-primitive intersection
 		for (int direction = 0; direction < 3; direction++) {
-			std::vector<std::vector<int>> bucket_index(B);
+			std::vector<std::vector<size_t>> bucket_index(B);
 			std::vector<BBox> bucket_box(B);
 
 			// split bbox into B buckets
 			double min_coord = bb.min[direction];
 			double max_coord = bb.max[direction];
 			double interval = (max_coord - min_coord) / B;
-			
+
 			// insert every primitive into specific bucket 
 			// in every possible direction
 			int bucket;
 			Vector3D centroid;
 			BBox temp_box;
-			for (int i : index) {
+			for (size_t i = start; i < start + range; i++) {
 				temp_box = _primitives[i]->get_bbox();
 				centroid = temp_box.centroid();
 				bucket = int((centroid[direction] - min_coord) / interval);
 				bucket_index[bucket].push_back(i);
 				bucket_box[bucket].expand(temp_box);
 			}
-			
+
 			// For each of the B-1 possible partitioning planes 
 			// that cuts the B number of buckets, evaluate SAH to find
 			// the best split
 			for (int b = 1; b < B; b++) {
-				NA = 0; 
+				NA = 0;
 				NB = 0;
 				BBox lbox, rbox;
 				for (int left = 0; left < b; left++) {
@@ -100,26 +86,40 @@ namespace StaticScene {
 			}
 		}
 
-		// partition the primitives using cut method 
+		// if best partition cannot be found, i.e. all
+		// primitives have the same center, return 
+		// BVH with all of them in a node
+		if (best_split == 0) return result;
+
+		// otherwise partition the primitives using cut method 
 		// that results in the lowest cost
 		double min_coord = bb.min[best_direction];
 		double max_coord = bb.max[best_direction];
 		double limit = (max_coord - min_coord) / B * best_split + min_coord;
-		std::vector<int> left_index;
-		std::vector<int> right_index;
+		std::vector<Primitive *> left_primitive;
+		std::vector<Primitive *> right_primitive;
 		Vector3D centroid;
 		BBox temp_box;
-		for (int i : index) {
+		for (size_t i = start; i < start + range; i++) {
 			temp_box = _primitives[i]->get_bbox();
 			centroid = temp_box.centroid();
-			if (centroid[best_direction] >= limit) right_index.push_back(i);
-			else left_index.push_back(i);
+			if (centroid[best_direction] >= limit) right_primitive.push_back(_primitives[i]);
+			else left_primitive.push_back(_primitives[i]);
+		}
+
+		// re-order the _primitives vector to put all primitives in
+		// left and right partition together
+		for (size_t i = 0; i < left_primitive.size(); i++) {
+			_primitives[i + start] = left_primitive[i];
+		}
+		for (size_t i = 0; i < right_primitive.size(); i++) {
+			_primitives[i + start + left_primitive.size()] = right_primitive[i];
 		}
 
 		// call itself recursively to build the left 
 		// and right subtrees
-		result->l = build_tree(_primitives, left_index, max_leaf_size);
-		result->r = build_tree(_primitives, right_index, max_leaf_size);
+		result->l = build_tree(_primitives, start, left_primitive.size(), max_leaf_size);
+		result->r = build_tree(_primitives, start + left_primitive.size(), right_primitive.size(), max_leaf_size);
 		return result;
 	}
 
@@ -133,9 +133,7 @@ namespace StaticScene {
 		// single leaf node (which is also the root) that encloses all the
 		// primitives.
 
-		std::vector<int> index(primitives.size());
-		for (int i = 0; i < primitives.size(); i++) index[i] = i;
-		root = build_tree(_primitives, index, max_leaf_size);
+		root = build_tree(this->primitives, 0, primitives.size(), max_leaf_size);
 	}
 
 	// delete the BVH tree recursively
@@ -151,6 +149,7 @@ namespace StaticScene {
 		// TODO (PathTracer):
 		// Implement a proper destructor for your BVH accelerator aggregate
 		delete_tree(root);
+		printf("BVH deleted!\n");
 	}
 
 BBox BVHAccel::get_bbox() const { return root->bb; }

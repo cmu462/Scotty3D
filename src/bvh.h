@@ -120,7 +120,8 @@ class BVHAccel : public Aggregate {
   // build the BVH tree using discussed in lecture 15
   // This function is called recursively
   // returns the root of the tree/sub-tree
-  BVHNode* build_tree(const std::vector<Primitive *> &_primitives, std::vector<int> & index, size_t max_leaf_size);
+  // changes the order of items in _primitives
+  BVHNode* build_tree(std::vector<Primitive *> &_primitives, size_t start, size_t range, size_t max_leaf_size);
 
   // delete the BVH tree recursively
   void delete_tree(BVHNode* node);
