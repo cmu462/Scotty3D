@@ -72,7 +72,7 @@ namespace CMU462 {
 		t0 = std::max(tx_min, std::max(ty_min, tz_min));
 		t1 = std::min(tx_max, std::min(ty_max, tz_max));
 
-		return t0 < t1;
+		return t0 <= t1;
 	}
 
 void BBox::draw(Color c) const {
