@@ -138,12 +138,20 @@ namespace StaticScene {
 		root = build_tree(_primitives, index, max_leaf_size);
 	}
 
+	// delete the BVH tree recursively
+	void BVHAccel::delete_tree(BVHNode* node) {
+		if (node == NULL) return;
+		delete_tree(node->l);
+		delete_tree(node->r);
+		delete node;
+		return;
+	}
 
-BVHAccel::~BVHAccel() {
-  // TODO (PathTracer):
-  // Implement a proper destructor for your BVH accelerator aggregate
-
-}
+	BVHAccel::~BVHAccel() {
+		// TODO (PathTracer):
+		// Implement a proper destructor for your BVH accelerator aggregate
+		delete_tree(root);
+	}
 
 BBox BVHAccel::get_bbox() const { return root->bb; }
 
