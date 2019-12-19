@@ -16,15 +16,20 @@ namespace StaticScene {
 	// returns the root of the tree/sub-tree
 	// index = indexes of primitives that belonged to this part of tree
 	BVHNode* BVHAccel::build_tree(const std::vector<Primitive *> & _primitives, std::vector<int> & index, size_t max_leaf_size) {
-		
+
 		int B = 8; // number of buckets to split
 		
 		// create root node with all primitives
 		BBox bb;
 		for (int i : index) bb.expand(primitives[i]->get_bbox());
-		root = new BVHNode(bb, index[0], index.size());
+		BVHNode* result = new BVHNode(bb, index[0], index.size());
 
 		// check for ending condition
+		if (index.size() == 2 && index[1] - index[0] != 1) {
+			result->l = build_tree(_primitives, std::vector<int>{index[0]}, max_leaf_size);
+			result->r = build_tree(_primitives, std::vector<int>{index[1]}, max_leaf_size);
+			return result;
+		}
 		if (index.size() <= max_leaf_size) {
 			bool is_consecutive = true;
 			for (int i = 1; i < index.size(); i++) {
@@ -33,19 +38,18 @@ namespace StaticScene {
 					break;
 				}
 			}
-			if (is_consecutive) return root;
+			if (is_consecutive) return result;
 		}
 
 		// if not leaf node, start spliting the space using 
 		// method discussed in lecture 15
 		int best_split = 0, best_direction = 0;
-		int temp_cost, best_cost = INF_D;
+		double temp_cost, best_cost = INF_D;
 		double SN = bb.surface_area(); // total surface area
 		double SA, SB; // surface area of two splits
 		int NA, NB; // number of primitives in the two region
 		double Ctrav = 0.0; // cost of traversing into next branch
 		double Cisect = 1.0; // cost of ray-primitive intersection
-
 		for (int direction = 0; direction < 3; direction++) {
 			std::vector<std::vector<int>> bucket_index(B);
 			std::vector<BBox> bucket_box(B);
@@ -54,7 +58,7 @@ namespace StaticScene {
 			double min_coord = bb.min[direction];
 			double max_coord = bb.max[direction];
 			double interval = (max_coord - min_coord) / B;
-
+			
 			// insert every primitive into specific bucket 
 			// in every possible direction
 			int bucket;
@@ -63,11 +67,11 @@ namespace StaticScene {
 			for (int i : index) {
 				temp_box = _primitives[i]->get_bbox();
 				centroid = temp_box.centroid();
-				bucket = int(centroid[direction] / interval);
+				bucket = int((centroid[direction] - min_coord) / interval);
 				bucket_index[bucket].push_back(i);
 				bucket_box[bucket].expand(temp_box);
 			}
-
+			
 			// For each of the B-1 possible partitioning planes 
 			// that cuts the B number of buckets, evaluate SAH to find
 			// the best split
@@ -86,7 +90,8 @@ namespace StaticScene {
 				SA = lbox.surface_area();
 				SB = rbox.surface_area();
 
-				temp_cost = Ctrav + SA / SN * NA*Cisect + SB / SN * NA*Cisect;
+				if (NA == 0 || NB == 0) continue;
+				temp_cost = Ctrav + SA / SN * NA*Cisect + SB / SN * NB*Cisect;
 				if (temp_cost < best_cost) {
 					best_cost = temp_cost;
 					best_split = b;
@@ -99,7 +104,7 @@ namespace StaticScene {
 		// that results in the lowest cost
 		double min_coord = bb.min[best_direction];
 		double max_coord = bb.max[best_direction];
-		double limit = (max_coord - min_coord) / B * best_split;
+		double limit = (max_coord - min_coord) / B * best_split + min_coord;
 		std::vector<int> left_index;
 		std::vector<int> right_index;
 		Vector3D centroid;
@@ -113,9 +118,9 @@ namespace StaticScene {
 
 		// call itself recursively to build the left 
 		// and right subtrees
-		root->l = build_tree(_primitives, left_index, max_leaf_size);
-		root->r = build_tree(_primitives, right_index, max_leaf_size);
-		return root;
+		result->l = build_tree(_primitives, left_index, max_leaf_size);
+		result->r = build_tree(_primitives, right_index, max_leaf_size);
+		return result;
 	}
 
 	BVHAccel::BVHAccel(const std::vector<Primitive *> &_primitives,
