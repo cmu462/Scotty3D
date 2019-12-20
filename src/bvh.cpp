@@ -99,15 +99,17 @@ namespace StaticScene {
 		// that results in the lowest cost
 		double min_coord = bb.min[best_direction];
 		double max_coord = bb.max[best_direction];
-		double limit = (max_coord - min_coord) / B * best_split + min_coord;
+		double interval = (max_coord - min_coord) / B;
 		std::vector<Primitive *> left_primitive;
 		std::vector<Primitive *> right_primitive;
 		Vector3D centroid;
 		BBox temp_box;
+		int bucket;
 		for (size_t i = start; i < start + range; i++) {
 			temp_box = _primitives[i]->get_bbox();
 			centroid = temp_box.centroid();
-			if (centroid[best_direction] >= limit) right_primitive.push_back(_primitives[i]);
+			bucket = int((centroid[best_direction] - min_coord) / interval);
+			if (bucket >= best_split) right_primitive.push_back(_primitives[i]);
 			else left_primitive.push_back(_primitives[i]);
 		}
 

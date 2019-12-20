@@ -7,3 +7,7 @@ sphere7_diffuse 1024SPP till Task4
 SPP: 1024
 Threads: 1  |  Time: 1425.3829s
 Threads: 4  |  Time: 302.8741s
+
+banana 1024SPP till Task4
+SPP: 1024
+Threads: 4  |  Time: 148s | run in background
