@@ -45,6 +45,9 @@ namespace StaticScene {
 			double max_coord = bb.max[direction];
 			double interval = (max_coord - min_coord) / B;
 
+			// no need to split in a direction without too much variation
+			if (abs(max_coord - min_coord) < 0.000001) continue;
+
 			// insert every primitive into specific bucket 
 			// in every possible direction
 			int bucket;
