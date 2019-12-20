@@ -189,10 +189,10 @@ bool BVHAccel::find_closest_hit(const Ray &ray, BVHNode* node, Intersection *ise
 		
 		if (!hit_l && !hit_r) return false;
 		else if (!hit_l && hit_r) {
-			return find_closest_hit(ray, root->r, isect);
+			return find_closest_hit(ray, node->r, isect);
 		}
 		else if (!hit_r && hit_l) {
-			return find_closest_hit(ray, root->l, isect);
+			return find_closest_hit(ray, node->l, isect);
 		}
 		else {
 			BVHNode* first, *second;
