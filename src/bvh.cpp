@@ -17,7 +17,7 @@ namespace StaticScene {
 	// changes the order of items in _primitives
 	BVHNode* BVHAccel::build_tree(std::vector<Primitive *> &_primitives, size_t start, size_t range, size_t max_leaf_size) {
 
-		int B = 8; // number of buckets to split
+		int B = 12; // number of buckets to split
 
 		// create root node with all primitives
 		BBox bb;
@@ -172,23 +172,49 @@ bool BVHAccel::intersect(const Ray &ray) const {
 	// the given BVH node. If there is hit, return the hit information
 	// to the primitive closed to the ray
 bool BVHAccel::find_closest_hit(const Ray &ray, BVHNode* node, Intersection *isect) const {
-	if (node == NULL) return false;
-
-	double t0, t1;
-	bool hit = node->bb.intersect(ray, t0, t1);
-	if (!hit) return false;
-
 	if (node->isLeaf()) {
-		hit = false;
+		bool hit = false;
 		for (size_t p = node->start; p < node->start + node->range; ++p) {
 			hit = hit | primitives[p]->intersect(ray, isect);
 		}
 		return hit;
 	}
 	else {
-		hit = find_closest_hit(ray, node->l, isect);
-		hit = hit | find_closest_hit(ray, node->r, isect);
-		return hit;
+		bool hit_l, hit_r;
+		double t0_l, t1_l, t0_r, t1_r;
+		if (node->l == NULL) hit_l = false;
+		else hit_l = node->l->bb.intersect(ray, t0_l, t1_l);
+		if (node->r == NULL) hit_r = false;
+		else hit_r = node->r->bb.intersect(ray, t0_r, t1_r);
+		
+		if (!hit_l && !hit_r) return false;
+		else if (!hit_l && hit_r) {
+			return find_closest_hit(ray, root->r, isect);
+		}
+		else if (!hit_r && hit_l) {
+			return find_closest_hit(ray, root->l, isect);
+		}
+		else {
+			BVHNode* first, *second;
+			double second_t;
+			bool true_hit;
+			if (t0_l <= t0_r) {
+				first = node->l;
+				second = node->r;
+				second_t = t0_r;
+			}
+			else {
+				first = node->r;
+				second = node->l;
+				second_t = t0_l;
+			}
+
+			true_hit = find_closest_hit(ray, first, isect);
+			if (!true_hit || isect->t > second_t) {
+				true_hit = true_hit | find_closest_hit(ray, second, isect);
+			}
+			return true_hit;
+		}
 	}
 }
 
@@ -199,8 +225,11 @@ bool BVHAccel::intersect(const Ray &ray, Intersection *isect) const {
 	// the BVH that is not an aggregate. When an intersection does happen.
 	// You should store the non-aggregate primitive in the intersection data
 	// and not the BVH aggregate itself.
-
-	return find_closest_hit(ray, root, isect);
+	if (root == NULL) return false;
+	double t0, t1;
+	bool hit = root->bb.intersect(ray, t0, t1);
+	if (!hit) return false;
+	else return find_closest_hit(ray, root, isect);
 }
 
 }  // namespace StaticScene
