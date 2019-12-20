@@ -127,8 +127,12 @@ class BVHAccel : public Aggregate {
   void delete_tree(BVHNode* node);
 
   // called recursivly to check if the ray is intersecting
+  // the given BVH node.
+  bool find_closest_hit(const Ray &ray, BVHNode* node) const;
+
+  // called recursivly to check if the ray is intersecting
   // the given BVH node. If there is hit, return the hit information
-  // to the primitive closed to the ray
+  // to the primitive closed to the ray. Uses node visit order optimizations
   bool find_closest_hit(const Ray &ray, BVHNode* node, Intersection *isect) const;
 };
 

@@ -109,17 +109,21 @@ namespace StaticScene {
 
 		// re-order the _primitives vector to put all primitives in
 		// left and right partition together
+		int left_primitive_size = left_primitive.size();
+		int right_primitive_size = right_primitive.size();
 		for (size_t i = 0; i < left_primitive.size(); i++) {
 			_primitives[i + start] = left_primitive[i];
 		}
 		for (size_t i = 0; i < right_primitive.size(); i++) {
-			_primitives[i + start + left_primitive.size()] = right_primitive[i];
+			_primitives[i + start + left_primitive_size] = right_primitive[i];
 		}
+		left_primitive.clear();
+		right_primitive.clear();
 
 		// call itself recursively to build the left 
 		// and right subtrees
-		result->l = build_tree(_primitives, start, left_primitive.size(), max_leaf_size);
-		result->r = build_tree(_primitives, start + left_primitive.size(), right_primitive.size(), max_leaf_size);
+		result->l = build_tree(_primitives, start, left_primitive_size, max_leaf_size);
+		result->r = build_tree(_primitives, start + left_primitive_size, right_primitive_size, max_leaf_size);
 		return result;
 	}
 
@@ -154,23 +158,41 @@ namespace StaticScene {
 
 BBox BVHAccel::get_bbox() const { return root->bb; }
 
+	// called recursivly to check if the ray is intersecting
+	// the given BVH node. 
+bool BVHAccel::find_closest_hit(const Ray &ray, BVHNode* node) const {
+	if (node == NULL) return false;
+
+	double t0, t1;
+	bool hit = node->bb.intersect(ray, t0, t1);
+	if (!hit) return false;
+
+	if (node->isLeaf()) {
+		hit = false;
+		for (size_t p = node->start; p < node->start + node->range; ++p) {
+			hit = hit | primitives[p]->intersect(ray);
+		}
+		return hit;
+	}
+	else {
+		hit = find_closest_hit(ray, node->l);
+		hit = hit | find_closest_hit(ray, node->r);
+		return hit;
+	}
+}
+
 bool BVHAccel::intersect(const Ray &ray) const {
   // TODO (PathTracer):
   // Implement ray - bvh aggregate intersection test. A ray intersects
   // with a BVH aggregate if and only if it intersects a primitive in
   // the BVH that is not an aggregate.
 
-  bool hit = false;
-  for (size_t p = 0; p < primitives.size(); ++p) {
-    if (primitives[p]->intersect(ray)) hit = true;
-  }
-
-  return hit;
+	return find_closest_hit(ray, root);
 }
 
 	// called recursivly to check if the ray is intersecting
 	// the given BVH node. If there is hit, return the hit information
-	// to the primitive closed to the ray
+	// to the primitive closed to the ray. Uses node visit order optimizations
 bool BVHAccel::find_closest_hit(const Ray &ray, BVHNode* node, Intersection *isect) const {
 	if (node->isLeaf()) {
 		bool hit = false;
