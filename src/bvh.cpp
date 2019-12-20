@@ -57,6 +57,7 @@ namespace StaticScene {
 				temp_box = _primitives[i]->get_bbox();
 				centroid = temp_box.centroid();
 				bucket = int((centroid[direction] - min_coord) / interval);
+				if (bucket == B) bucket--; // prevent the centriod to be the same as max_coord
 				bucket_index[bucket].push_back(i);
 				bucket_box[bucket].expand(temp_box);
 			}

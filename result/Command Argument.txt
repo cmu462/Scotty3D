@@ -1,3 +1,4 @@
+../../media/meshedit/cube.dae
 ../../media/pathtracer/basic/carim_diffuse.dae
 ../../media/pathtracer/advanced/bunny.dae
 
