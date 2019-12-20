@@ -485,7 +485,8 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
 		Vector3D o = hit_p + EPS_D * dir_to_light;
 		Ray shadow_ray(o, dir_to_light);
 		Intersection new_isect;
-		if (!bvh->intersect(shadow_ray, &new_isect)) {
+		bool hit = bvh->intersect(shadow_ray, &new_isect);
+		if (!hit || new_isect.t >= dist_to_light - EPS_D - 0.000001) {
 			L_out += (cos_theta / (num_light_samples * pr)) * f * light_L;
 		}
       }
