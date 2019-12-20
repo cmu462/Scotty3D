@@ -123,8 +123,8 @@ Ray Camera::generate_ray(double x, double y) {
 	// TODO (PathTracer):
 	// compute position of the input sensor sample coordinate on the
 	// canonical sensor plane one unit away from the pinhole.
-
-	double H = tan(v_fov() / 2);
+	double v_fov_rad = v_fov() / 180.0*PI;
+	double H = tan(v_fov_rad / 2);
 	double W = aspect_ratio() * H;
 
 	x = x / 0.5* W;
