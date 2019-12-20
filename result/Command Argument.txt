@@ -1,0 +1,5 @@
+../../media/pathtracer/basic/carim_diffuse.dae
+../../media/pathtracer/advanced/bunny.dae
+
+-t 8 -s 1024 ../../media/pathtracer/basic/carim_diffuse.dae
+-t 4 -s 1024 -w C:/Users/wangx/Desktop ../../media/pathtracer/basic/sphere7_diffuse.dae

@@ -1,9 +1,9 @@
 carim_diffuse 1024SPP till Task4
 SPP: 1024
-Threads: 8
-Time: 1246.5491s
+Threads: 1  |  Time: 1246.5491s
+Threads: 8  |  Time: 368.8902s
 
 sphere7_diffuse 1024SPP till Task4
 SPP: 1024
-Threads: 8
-Time: 1425.3829
+Threads: 1  |  Time: 1425.3829s
+Threads: 4  |  Time: 302.8741s
