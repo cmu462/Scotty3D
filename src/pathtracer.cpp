@@ -400,7 +400,7 @@ void PathTracer::key_press(int key) {
 
 Spectrum PathTracer::trace_ray(const Ray &r) {
   Intersection isect;
-  //log_ray_miss(r); // DELETE THAT THING!!!!!
+
   if (!bvh->intersect(r, &isect)) {
 // log ray miss
 //#ifdef ENABLE_RAY_LOGGING
@@ -427,7 +427,8 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
   // indirect lighting components calculated in the code below. The starter
   // code overwrites L_out by (.5,.5,.5) so that you can test your geometry
   // queries before you implement path tracing.
-  L_out = Spectrum(5.f, 5.f, 5.f);
+  
+  //L_out = Spectrum(5.f, 5.f, 5.f);
 
   Vector3D hit_p = r.o + r.d * isect.t;
   Vector3D hit_n = isect.n;
@@ -471,7 +472,7 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
         const Vector3D& w_in = w2o * dir_to_light;
         if (w_in.z < 0) continue;
 
-          // note that computing dot(n,w_in) is simple
+        // note that computing dot(n,w_in) is simple
         // in surface coordinates since the normal is (0,0,1)
         double cos_theta = w_in.z;
           
@@ -481,7 +482,12 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
         // TODO (PathTracer):
         // (Task 4) Construct a shadow ray and compute whether the intersected surface is
         // in shadow. Only accumulate light if not in shadow.
-        L_out += (cos_theta / (num_light_samples * pr)) * f * light_L;
+		Vector3D o = hit_p + EPS_D * dir_to_light;
+		Ray shadow_ray(o, dir_to_light);
+		Intersection new_isect;
+		if (!bvh->intersect(shadow_ray, &new_isect)) {
+			L_out += (cos_theta / (num_light_samples * pr)) * f * light_L;
+		}
       }
     }
   }
@@ -530,7 +536,7 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
 			a2 = (double(y) + p.y) / h;
 			result += trace_ray(camera->generate_ray(a1 - 0.5, a2 - 0.5));
 		}
-
+		result *= 1.0 / num_samples;
 		return result;
 	}
 }
