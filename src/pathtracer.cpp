@@ -399,127 +399,126 @@ void PathTracer::key_press(int key) {
 
 
 Spectrum PathTracer::trace_ray(const Ray &r) {
-  Intersection isect;
+	Intersection isect;
 
-  if (!bvh->intersect(r, &isect)) {
-// log ray miss
-//#ifdef ENABLE_RAY_LOGGING
-//    log_ray_miss(r);
-//#endif
-	if (ENABLE_RAY_LOGGiNG) log_ray_miss(r);
+	if (!bvh->intersect(r, &isect)) {
+		// log ray miss
+		//#ifdef ENABLE_RAY_LOGGING
+		//    log_ray_miss(r);
+		//#endif
+		if (ENABLE_RAY_LOGGiNG) log_ray_miss(r);
 
-    // TODO (PathTracer):
-    // (Task 7) If you have an environment map, return the Spectrum this ray
-    // samples from the environment map. If you don't return black.
-    return Spectrum(0, 0, 0);
-  }
+		// TODO (PathTracer):
+		// (Task 7) If you have an environment map, return the Spectrum this ray
+		// samples from the environment map. If you don't return black.
+		return Spectrum(0, 0, 0);
+	}
 
-// log ray hit
-//#ifdef ENABLE_RAY_LOGGING
-//  log_ray_hit(r, isect.t);
-//#endif
-  if (ENABLE_RAY_LOGGiNG) log_ray_hit(r, isect.t);
+	// log ray hit
+	//#ifdef ENABLE_RAY_LOGGING
+	//  log_ray_hit(r, isect.t);
+	//#endif
+	if (ENABLE_RAY_LOGGiNG) log_ray_hit(r, isect.t);
 
-  Spectrum L_out = isect.bsdf->get_emission();  // Le
+	Spectrum L_out = isect.bsdf->get_emission();  // Le
 
-  // TODO (PathTracer):
-  // Instead of initializing this value to a constant color, use the direct,
-  // indirect lighting components calculated in the code below. The starter
-  // code overwrites L_out by (.5,.5,.5) so that you can test your geometry
-  // queries before you implement path tracing.
-  
-  //L_out = Spectrum(5.f, 5.f, 5.f);
+	// TODO (PathTracer):
+	// Instead of initializing this value to a constant color, use the direct,
+	// indirect lighting components calculated in the code below. The starter
+	// code overwrites L_out by (.5,.5,.5) so that you can test your geometry
+	// queries before you implement path tracing.
 
-  Vector3D hit_p = r.o + r.d * isect.t;
-  Vector3D hit_n = isect.n;
+	//L_out = Spectrum(5.f, 5.f, 5.f);
 
-  // make a coordinate system for a hit point
-  // with N aligned with the Z direction.
-  Matrix3x3 o2w;
-  make_coord_space(o2w, isect.n);
-  Matrix3x3 w2o = o2w.T();
+	Vector3D hit_p = r.o + r.d * isect.t;
+	Vector3D hit_n = isect.n;
 
-  // w_out points towards the source of the ray (e.g.,
-  // toward the camera if this is a primary ray)
-  Vector3D w_out = w2o * (r.o - hit_p);
-  w_out.normalize();
+	// make a coordinate system for a hit point
+	// with N aligned with the Z direction.
+	Matrix3x3 o2w;
+	make_coord_space(o2w, isect.n);
+	Matrix3x3 w2o = o2w.T();
+
+	// w_out points towards the source of the ray (e.g.,
+	// toward the camera if this is a primary ray)
+	Vector3D w_out = w2o * (r.o - hit_p);
+	w_out.normalize();
 
 
-  if (!isect.bsdf->is_delta()) {
-    Vector3D dir_to_light;
-    float dist_to_light;
-    float pr;
+	if (!isect.bsdf->is_delta()) {
+		Vector3D dir_to_light;
+		float dist_to_light;
+		float pr;
 
-    // ### Estimate direct lighting integral
+		// ### Estimate direct lighting integral
 
-    for (SceneLight* light : scene->lights) {
+		for (SceneLight* light : scene->lights) {
 
-      // no need to take multiple samples from a point/directional source
-      int num_light_samples = light->is_delta_light() ? 1 : ns_area_light;
+			// no need to take multiple samples from a point/directional source
+			int num_light_samples = light->is_delta_light() ? 1 : ns_area_light;
 
-      // integrate light over the hemisphere about the normal
-      for (int i = 0; i < num_light_samples; i++) {
+			// integrate light over the hemisphere about the normal
+			for (int i = 0; i < num_light_samples; i++) {
 
-        // returns a vector 'dir_to_light' that is a direction from
-        // point hit_p to the point on the light source.  It also returns
-        // the distance from point x to this point on the light source.
-        // (pr is the probability of randomly selecting the random
-        // sample point on the light source -- more on this in part 2)
-        const Spectrum& light_L = light->sample_L(hit_p, &dir_to_light, &dist_to_light, &pr);
+				// returns a vector 'dir_to_light' that is a direction from
+				// point hit_p to the point on the light source.  It also returns
+				// the distance from point x to this point on the light source.
+				// (pr is the probability of randomly selecting the random
+				// sample point on the light source -- more on this in part 2)
+				const Spectrum& light_L = light->sample_L(hit_p, &dir_to_light, &dist_to_light, &pr);
 
-        // convert direction into coordinate space of the surface, where
-        // the surface normal is [0 0 1]
-        const Vector3D& w_in = w2o * dir_to_light;
-        if (w_in.z < 0) continue;
+				// convert direction into coordinate space of the surface, where
+				// the surface normal is [0 0 1]
+				const Vector3D& w_in = w2o * dir_to_light;
+				if (w_in.z < 0) continue;
 
-        // note that computing dot(n,w_in) is simple
-        // in surface coordinates since the normal is (0,0,1)
-        double cos_theta = w_in.z;
-          
-        // evaluate surface bsdf
-        const Spectrum& f = isect.bsdf->f(w_out, w_in);
+				// note that computing dot(n,w_in) is simple
+				// in surface coordinates since the normal is (0,0,1)
+				double cos_theta = w_in.z;
 
-        // TODO (PathTracer):
-        // (Task 4) Construct a shadow ray and compute whether the intersected surface is
-        // in shadow. Only accumulate light if not in shadow.
-		Vector3D o = hit_p + EPS_D * dir_to_light;
-		Ray shadow_ray(o, dir_to_light);
-		Intersection new_isect;
-		bool hit = bvh->intersect(shadow_ray, &new_isect);
-		if (!hit || new_isect.t >= dist_to_light - EPS_D - 0.000001) {
-			L_out += (cos_theta / (num_light_samples * pr)) * f * light_L;
+				// evaluate surface bsdf
+				const Spectrum& f = isect.bsdf->f(w_out, w_in);
+
+				// TODO (PathTracer):
+				// (Task 4) Construct a shadow ray and compute whether the intersected surface is
+				// in shadow. Only accumulate light if not in shadow.
+				Vector3D o = hit_p + EPS_D * dir_to_light;
+				Ray shadow_ray(o, dir_to_light);
+				Intersection new_isect;
+				bool hit = bvh->intersect(shadow_ray, &new_isect);
+				if (!hit || new_isect.t >= dist_to_light - EPS_D - 0.000001) {
+					L_out += (cos_theta / (num_light_samples * pr)) * f * light_L;
+				}
+			}
 		}
-      }
-    }
-  }
+	}
 
-  // TODO (PathTracer):
-  // ### (Task 5) Compute an indirect lighting estimate using pathtracing with Monte Carlo.
+	// TODO (PathTracer):
+	// ### (Task 5) Compute an indirect lighting estimate using pathtracing with Monte Carlo.
 
-  // Note that Ray objects have a depth field now; you should use this to avoid
-  // traveling down one path forever.
-  //if (r.depth > max_ray_depth) return L_out;
-  //
-  //Spectrum f;
-  //Vector3D wi;
-  //float pdf;
-  //Spectrum L_path_trace;
-  //for (int index = 0; index < 100; index++) {
-	 // // (1) randomly select a new ray direction (it may be
-	 // // reflection or transmittence ray depending on
-	 // // surface type -- see BSDF::sample_f()
-	 // f = isect.bsdf->sample_f(wo, &wi, &pdf);
-	 // Ray new_ray(o,wi,r.depth+1);
+	// Note that Ray objects have a depth field now; you should use this to avoid
+	// traveling down one path forever.
+	if (r.depth >= max_ray_depth) return L_out;
 
-	 // // (2) potentially terminate path (using Russian roulette)
+	// (1) randomly select a new ray direction (it may be
+	// reflection or transmittence ray depending on
+	// surface type -- see BSDF::sample_f()
+	Vector3D wi;
+	float pdf;
+	Spectrum f = isect.bsdf->sample_f(w_out, &wi, &pdf);
+	Vector3D new_o = hit_p + EPS_D * wi;
+	Ray new_ray(new_o, wi);
+	new_ray.depth = r.depth + 1;
+	double cos_theta = wi.z;
 
-	 // // (3) evaluate weighted reflectance contribution due 
-	 // // to light from this direction
-	 // L_path_trace = trace_ray(new_ray);
-	 // L_out += f * L_path_trace * cos_theta / (num_light_samples * pr);
-  //}
+	// (2) potentially terminate path (using Russian roulette)
 
-  return L_out;
+	// (3) evaluate weighted reflectance contribution due 
+	// to light from this direction
+	Spectrum L_path_trace = trace_ray(new_ray);
+	L_out += f * L_path_trace * cos_theta / (num_light_samples * pdf);
+
+	return L_out;
 }
 
 Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
