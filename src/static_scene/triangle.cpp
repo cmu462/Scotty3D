@@ -74,6 +74,11 @@ bool Triangle::intersect(const Ray& r, Intersection* isect) const {
 
 	Vector3D e1xd = cross(e1, d);
 	double det = dot(e1xd, e2);
+
+	if (det < 0.0) {
+		s *= -1;
+		det *= -1;
+	}
 	if (det < 0.00001) return false;
 
 	Vector3D sxe2 = cross(s, e2);
