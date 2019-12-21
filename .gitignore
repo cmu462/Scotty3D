@@ -6,3 +6,4 @@ build_debug
 *.sublime-project
 .idea/
 cmake-build-debug/
+Buffer scense location.lnk

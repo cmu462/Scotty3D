@@ -496,18 +496,28 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
   // TODO (PathTracer):
   // ### (Task 5) Compute an indirect lighting estimate using pathtracing with Monte Carlo.
 
-
   // Note that Ray objects have a depth field now; you should use this to avoid
   // traveling down one path forever.
-  
-  // (1) randomly select a new ray direction (it may be
-  // reflection or transmittence ray depending on
-  // surface type -- see BSDF::sample_f()
+  //if (r.depth > max_ray_depth) return L_out;
+  //
+  //Spectrum f;
+  //Vector3D wi;
+  //float pdf;
+  //Spectrum L_path_trace;
+  //for (int index = 0; index < 100; index++) {
+	 // // (1) randomly select a new ray direction (it may be
+	 // // reflection or transmittence ray depending on
+	 // // surface type -- see BSDF::sample_f()
+	 // f = isect.bsdf->sample_f(wo, &wi, &pdf);
+	 // Ray new_ray(o,wi,r.depth+1);
 
-  // (2) potentially terminate path (using Russian roulette)
+	 // // (2) potentially terminate path (using Russian roulette)
 
-  // (3) evaluate weighted reflectance contribution due 
-  // to light from this direction
+	 // // (3) evaluate weighted reflectance contribution due 
+	 // // to light from this direction
+	 // L_path_trace = trace_ray(new_ray);
+	 // L_out += f * L_path_trace * cos_theta / (num_light_samples * pr);
+  //}
 
   return L_out;
 }
@@ -527,12 +537,11 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
 		return trace_ray(camera->generate_ray(p.x-0.5, p.y-0.5));
 	}
 	else {
-		UniformGridSampler2D sampler;
 		Vector2D p;
 		double a1, a2;
 		Spectrum result(0, 0, 0);
 		for (int i = 0; i < num_samples; i++) {
-			p = sampler.get_sample();
+			p = gridSampler->get_sample();
 			a1 = (double(x) + p.x) / w;
 			a2 = (double(y) + p.y) / h;
 			result += trace_ray(camera->generate_ray(a1 - 0.5, a2 - 0.5));

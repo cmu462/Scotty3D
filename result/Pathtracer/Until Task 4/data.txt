@@ -25,3 +25,7 @@ Threads: 4  |  Time: 494.7048s | run in background
 wall-e 1024SPP till Task4
 SPP: 1024
 Threads: 4  |  Time: 619.2490s | run in background
+
+CBspheres_lambertian without global light
+SPP: 1024
+Threads: 4  |  Time: 174.0872s | run in background
