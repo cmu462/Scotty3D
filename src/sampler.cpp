@@ -33,8 +33,19 @@ Vector3D CosineWeightedHemisphereSampler3D::get_sample() const {
 }
 
 Vector3D CosineWeightedHemisphereSampler3D::get_sample(float *pdf) const {
-  // You may implement this, but don't have to.
-  return Vector3D(0, 0, 1);
+	// You may implement this, but don't have to.
+
+	// uniform sample points in a unit circle
+	// see slide 19 page 35
+	double x1 = (double)(std::rand()) / RAND_MAX;
+	double x2 = (double)(std::rand()) / RAND_MAX;
+	double theta = 2.0*PI*x1;
+	double r = sqrt(x2);
+	double x = r * cos(theta);
+	double y = r * sin(theta);
+
+	// project them up onto the unit hemisphere
+	return Vector3D(x,y,sqrt(1-x*x-y*y));
 }
 
 }  // namespace CMU462

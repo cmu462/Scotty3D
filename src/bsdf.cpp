@@ -39,9 +39,13 @@ Spectrum DiffuseBSDF::f(const Vector3D& wo, const Vector3D& wi) {
 }
 
 Spectrum DiffuseBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
-  // TODO (PathTracer):
-  // Implement DiffuseBSDF
-  return Spectrum();
+	// TODO (PathTracer):
+	// Implement DiffuseBSDF
+
+	// use Cosine-Weighted sampling
+	*wi = sampler.get_sample();
+	*pdf = wi->z / PI; // wi->z = cos(theta)
+	return f(wo,*wi);
 }
 
 // Mirror BSDF //

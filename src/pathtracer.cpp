@@ -512,12 +512,13 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
 	double cos_theta = wi.z;
 
 	// (2) potentially terminate path (using Russian roulette)
+	double terminateProbability = 0.0;
+	if (double(rand()) / RAND_MAX <= terminateProbability) return L_out;
 
 	// (3) evaluate weighted reflectance contribution due 
 	// to light from this direction
 	Spectrum L_path_trace = trace_ray(new_ray);
-	L_out += f * L_path_trace * cos_theta / (num_light_samples * pdf);
-
+	L_out += f * L_path_trace * cos_theta * (1.0 / (pdf * (1 - terminateProbability)));
 	return L_out;
 }
 
