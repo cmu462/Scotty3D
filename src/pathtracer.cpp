@@ -506,19 +506,20 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
 	Vector3D wi;
 	float pdf;
 	Spectrum f = isect.bsdf->sample_f(w_out, &wi, &pdf);
-	Vector3D new_o = hit_p + EPS_D * wi;
-	Ray new_ray(new_o, wi);
+	Vector3D wi_world = (o2w *wi).unit(); // convert sampled direction to world coordinate
+	Vector3D new_o = hit_p + EPS_D * wi_world;
+	Ray new_ray(new_o, wi_world);
 	new_ray.depth = r.depth + 1;
 	double cos_theta = wi.z;
 
 	// (2) potentially terminate path (using Russian roulette)
 	double terminateProbability = 0.0;
-	if (double(rand()) / RAND_MAX <= terminateProbability) return L_out;
+	if ((double(rand()) / RAND_MAX) <= terminateProbability) return L_out;
 
 	// (3) evaluate weighted reflectance contribution due 
 	// to light from this direction
 	Spectrum L_path_trace = trace_ray(new_ray);
-	L_out += f * L_path_trace * cos_theta * (1.0 / (pdf * (1 - terminateProbability)));
+	L_out += f * L_path_trace * cos_theta * (1.0 / (pdf * (1.0 - terminateProbability)));
 	return L_out;
 }
 
