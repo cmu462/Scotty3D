@@ -3,3 +3,9 @@ SPP: 1024
 Number of samples per area light: 4
 Maximum ray depth: 4
 Threads: 4  |  Time: 235.5148s
+
+CBbunny Task 5 with spectrum clipping
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 438.9635s
