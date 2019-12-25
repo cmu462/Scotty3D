@@ -82,7 +82,7 @@ class Spectrum {
   }
 
   inline float illum() const { 
-    return 0.2126f * r + 0.7152f * g + 0.0722f * b;
+	  return 0.2126f * r + 0.7152f * g + 0.0722f * b;
   }
 
   static Spectrum fromColor(const Color &c) {

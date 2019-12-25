@@ -43,8 +43,19 @@ Spectrum DiffuseBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 	// Implement DiffuseBSDF
 
 	// use Cosine-Weighted sampling
-	*wi = sampler.get_sample();
-	*pdf = wi->z / PI; // wi->z = cos(theta)
+	//*wi = sampler.get_sample();
+	//*pdf = wi->z / PI; // wi->z = cos(theta)
+	double Xi1 = (double)(std::rand()) / RAND_MAX;
+	double Xi2 = (double)(std::rand()) / RAND_MAX;
+
+	double theta = acos(Xi1);
+	double phi = 2.0 * PI * Xi2;
+
+	wi->x = sinf(theta) * cosf(phi);
+	wi->y = sinf(theta) * sinf(phi);
+	wi->z = cosf(theta);
+	*pdf = 1.0 / 2.0 / PI;
+
 	return f(wo,*wi);
 }
 

@@ -29,3 +29,7 @@ Threads: 4  |  Time: 619.2490s | run in background
 CBspheres_lambertian without global light
 SPP: 1024
 Threads: 4  |  Time: 174.0872s | run in background
+
+CBbunny without global light
+SPP: 1024
+Threads: 4  |  Time: 414.1816s | run in background
