@@ -79,14 +79,17 @@ Spectrum GlossyBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 // Refraction BSDF //
 
 Spectrum RefractionBSDF::f(const Vector3D& wo, const Vector3D& wi) {
-  return Spectrum();
+	return Spectrum(1.0f, 1.0f, 1.0f);
 }
 
 Spectrum RefractionBSDF::sample_f(const Vector3D& wo, Vector3D* wi,
-                                  float* pdf) {
-  // TODO (PathTracer):
-  // Implement RefractionBSDF
-  return Spectrum();
+	float* pdf) {
+	// TODO (PathTracer):
+	// Implement RefractionBSDF
+	bool external = refract(wo, wi, ior);
+	*pdf = 1.0;
+	if (external) return f(wo, *wi);
+	else return Spectrum();
 }
 
 // Glass BSDF //
@@ -111,14 +114,25 @@ void BSDF::reflect(const Vector3D& wo, Vector3D* wi) {
 }
 
 bool BSDF::refract(const Vector3D& wo, Vector3D* wi, float ior) {
-  // TODO (PathTracer):
-  // Use Snell's Law to refract wo surface and store result ray in wi.
-  // Return false if refraction does not occur due to total internal reflection
-  // and true otherwise. When dot(wo,n) is positive, then wo corresponds to a
-  // ray entering the surface through vacuum.
+	// TODO (PathTracer):
+	// Use Snell's Law to refract wo surface and store result ray in wi.
+	// Return false if refraction does not occur due to total internal reflection
+	// and true otherwise. When dot(wo,n) is positive, then wo corresponds to a
+	// ray entering the surface through vacuum.
+	float theta2, sin_theta2;
+	float theta1 = acosf(abs(wo.z));
+	if (wo.z >= 0) sin_theta2 = 1.0f * sin(theta1) / ior;
+	else sin_theta2 = ior * sin(theta1) / 1.0f;
+	if (sin_theta2 > 1.0f) return false;
+	else theta2 = asinf(sin_theta2);
 
+	wi->x = -wo.x;
+	wi->y = -wo.y;
+	wi->z = sqrt(wi->x*wi->x + wi->y*wi->y) / tan(theta2);
+	*wi = wi->unit();
 
-  return true;
+	if (wo.z >= 0) wi->z *= -1.0;
+	return true;
 }
 
 // Emission BSDF //
