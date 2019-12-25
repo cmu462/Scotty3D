@@ -498,31 +498,28 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
 
 	// Note that Ray objects have a depth field now; you should use this to avoid
 	// traveling down one path forever.
-	//if (r.depth >= max_ray_depth) return L_out;
+	if (r.depth >= max_ray_depth) return L_out;
 
-	//// (1) randomly select a new ray direction (it may be
-	//// reflection or transmittence ray depending on
-	//// surface type -- see BSDF::sample_f()
-	//Vector3D wi;
-	//float pdf;
-	//Spectrum f = isect.bsdf->sample_f(w_out, &wi, &pdf);
-	//Vector3D wi_world = (o2w *wi).unit(); // convert sampled direction to world coordinate
-	//Vector3D new_o = hit_p + EPS_D * wi_world;
-	//Ray new_ray(new_o, wi_world);
-	//new_ray.depth = r.depth + 1;
-	//double cos_theta = wi.z;
+	// (1) randomly select a new ray direction (it may be
+	// reflection or transmittence ray depending on
+	// surface type -- see BSDF::sample_f()
+	Vector3D wi;
+	float pdf;
+	Spectrum f = isect.bsdf->sample_f(w_out, &wi, &pdf);
+	Vector3D wi_world = (o2w *wi).unit(); // convert sampled direction to world coordinate
+	Vector3D new_o = hit_p + EPS_D * wi_world;
+	Ray new_ray(new_o, wi_world);
+	new_ray.depth = r.depth + 1;
+	double cos_theta = wi.z;
 
-	//// (2) potentially terminate path (using Russian roulette)
-	//float terminateProbability = std::max(0.0f, std::min(1.0f, 1.0f - f.illum()));
-	//if ((double(rand()) / RAND_MAX) < terminateProbability) return L_out;
+	// (2) potentially terminate path (using Russian roulette)
+	float terminateProbability = std::max(0.0f, std::min(1.0f, 1.0f - f.illum()));
+	if ((double(rand()) / RAND_MAX) < terminateProbability) return L_out;
 
-	//// (3) evaluate weighted reflectance contribution due 
-	//// to light from this direction
-	//Spectrum L_path_trace = trace_ray(new_ray);
-	//L_out += f * L_path_trace * cos_theta * (1.0 / (pdf * (1.0f - terminateProbability)));
-	L_out.r = std::min(1.0f, std::max(0.0f, L_out.r));
-	L_out.g = std::min(1.0f, std::max(0.0f, L_out.g));
-	L_out.b = std::min(1.0f, std::max(0.0f, L_out.b));
+	// (3) evaluate weighted reflectance contribution due 
+	// to light from this direction
+	Spectrum L_path_trace = trace_ray(new_ray);
+	L_out += f * L_path_trace * cos_theta * (1.0 / (pdf * (1.0f - terminateProbability)));
 	return L_out;
 }
 
@@ -549,9 +546,8 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
 			p = gridSampler->get_sample();
 			a1 = (double(x) + p.x) / w;
 			a2 = (double(y) + p.y) / h;
-			result += trace_ray(camera->generate_ray(a1 - 0.5, a2 - 0.5));
+			result += trace_ray(camera->generate_ray(a1 - 0.5, a2 - 0.5)) * (1.0 / num_samples);
 		}
-		result *= 1.0 / num_samples;
 		return result;
 	}
 }

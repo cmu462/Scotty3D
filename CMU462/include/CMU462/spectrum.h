@@ -25,7 +25,9 @@ class Spectrum {
    * \param g Intensity of the green spectrum
    * \param b Intensity of the blue spectrum
    */
-  Spectrum(float r = 0, float g = 0, float b = 0) : r(r), g(g), b(b) {}
+  Spectrum(float r = 0, float g = 0, float b = 0) : r(r), g(g), b(b) {
+	  clampRGB();
+  }
 
   /**
    * Constructor.
@@ -44,6 +46,7 @@ class Spectrum {
     r += rhs.r;
     g += rhs.g;
     b += rhs.b;
+	clampRGB();
     return *this;
   }
 
@@ -55,6 +58,7 @@ class Spectrum {
     r *= rhs.r;
     g *= rhs.g;
     b *= rhs.b;
+	clampRGB();
     return *this;
   }
 
@@ -66,6 +70,7 @@ class Spectrum {
     r *= s;
     g *= s;
     b *= s;
+	clampRGB();
     return *this;
   }
 
@@ -87,6 +92,13 @@ class Spectrum {
 
   static Spectrum fromColor(const Color &c) {
     return Spectrum(c.a * c.r, c.a * c.g, c.a * c.b);
+  }
+
+  // clamp the r,g,b values to be within 0 to 1
+  void clampRGB() {
+	  r = std::min(1.0f, std::max(0.0f, r));
+	  g = std::min(1.0f, std::max(0.0f, g));
+	  b = std::min(1.0f, std::max(0.0f, b));
   }
 
 
