@@ -114,7 +114,7 @@ Spectrum GlassBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 
 	Vector3D wi_refract;
 	bool external = refract(wo, &wi_refract, ior);
-	if (wo.z < 0)std::cout << wi_refract << std::endl;
+	//if (wo.z < 0)std::cout << wi_refract << std::endl;
 	if (external) cos_theta_t = abs(wi_refract.z);
 	else cos_theta_t = 0.0f;
 	cos_theta_i = abs(wo.z);

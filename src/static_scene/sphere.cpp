@@ -31,10 +31,15 @@ namespace StaticScene {
 		// TODO (PathTracer):
 		// Implement ray - sphere intersection.
 		// Note that you might want to use the the Sphere::test helper here.
-		double t1, t2;
+		double t1, t2, first_hit;
 		bool result = test(ray, t1, t2);
-		if (result && t1 <= ray.max_t && t1 >= ray.min_t) {
-			ray.max_t = t1;
+		// take into consideration when the origin of the
+		// ray is inside the sphere
+		if (t1 < 0) first_hit = t2;
+		else first_hit = t1;
+
+		if (result && first_hit <= ray.max_t && first_hit >= ray.min_t) {
+			ray.max_t = first_hit;
 			return true;
 		}
 		else return false;
@@ -46,13 +51,19 @@ namespace StaticScene {
 		// Note again that you might want to use the the Sphere::test helper here.
 		// When an intersection takes place, the Intersection data should be updated
 		// correspondingly.
-		double t1, t2;
+		double t1, t2, first_hit;
 		bool result = test(ray, t1, t2);
-		if (result && t1 <= ray.max_t && t1 >= ray.min_t) {
-			ray.max_t = t1;
 
-			isect->t = t1;
-			isect->n = normal(ray.o+ray.d*t1);
+		// take into consideration when the origin of the
+		// ray is inside the sphere
+		if (t1 < 0) first_hit = t2;
+		else first_hit = t1;
+
+		if (result && first_hit <= ray.max_t && first_hit >= ray.min_t) {
+			ray.max_t = first_hit;
+
+			isect->t = first_hit;
+			isect->n = normal(ray.o+ray.d*first_hit);
 			isect->bsdf = get_bsdf();
 			isect->primitive = this;
 

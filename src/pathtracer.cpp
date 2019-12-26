@@ -24,7 +24,7 @@ using std::max;
 
 namespace CMU462 {
 
- #define ENABLE_RAY_LOGGiNG 1
+ #define ENABLE_RAY_LOGGiNG 0
 
 PathTracer::PathTracer(size_t ns_aa, size_t max_ray_depth, size_t ns_area_light,
                        size_t ns_diff, size_t ns_glsy, size_t ns_refr,
