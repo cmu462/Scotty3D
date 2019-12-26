@@ -187,14 +187,16 @@ class RefractionBSDF : public BSDF {
  */
 class GlassBSDF : public BSDF {
  public:
-  GlassBSDF(const Spectrum& transmittance, const Spectrum& reflectance,
-            float roughness, float ior)
-      : transmittance(transmittance),
-        reflectance(reflectance),
-        roughness(roughness),
-        ior(ior) {
-    rasterize_color = transmittance;
-  }
+	 GlassBSDF(const Spectrum& transmittance, const Spectrum& reflectance,
+		 float roughness, float ior)
+		 : transmittance(transmittance),
+		 reflectance(reflectance),
+		 roughness(roughness),
+		 ior(ior),
+		 mirrorBSDF(reflectance),
+		 refractionBSDF(transmittance, roughness, ior) {
+		 rasterize_color = transmittance;
+	 }
 
   Spectrum f(const Vector3D& wo, const Vector3D& wi);
   Spectrum sample_f(const Vector3D& wo, Vector3D* wi, float* pdf);
@@ -206,6 +208,8 @@ class GlassBSDF : public BSDF {
   float roughness;
   Spectrum reflectance;
   Spectrum transmittance;
+  RefractionBSDF refractionBSDF;
+  MirrorBSDF mirrorBSDF;
 
 };  // class GlassBSDF
 
