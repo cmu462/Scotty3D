@@ -1,6 +1,7 @@
 ../../media/meshedit/cube.dae
 ../../media/pathtracer/basic/carim_diffuse.dae
 ../../media/pathtracer/advanced/bunny.dae
+../../media/pathtracer/basic/sphere_glass.dae
 
 -t 8 -s 1024 ../../media/pathtracer/basic/carim_diffuse.dae
 -t 4 -s 1024 -w C:/Users/wangx/Desktop/test.png ../../media/pathtracer/basic/sphere7_diffuse.dae

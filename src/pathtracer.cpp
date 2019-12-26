@@ -24,7 +24,7 @@ using std::max;
 
 namespace CMU462 {
 
- #define ENABLE_RAY_LOGGiNG 0
+ #define ENABLE_RAY_LOGGiNG 1
 
 PathTracer::PathTracer(size_t ns_aa, size_t max_ray_depth, size_t ns_area_light,
                        size_t ns_diff, size_t ns_glsy, size_t ns_refr,
@@ -511,6 +511,9 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
 	Ray new_ray(new_o, wi_world);
 	new_ray.depth = r.depth + 1;
 	double cos_theta = wi.z;
+
+	/*Vector3D in = (hit_p - r.o).unit();
+	cout << "In: " << in << "  Out: " << wi_world << endl;*/
 
 	// (2) potentially terminate path (using Russian roulette)
 	float terminateProbability = std::max(0.0f, std::min(1.0f, 1.0f - f.illum()));

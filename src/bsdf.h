@@ -192,9 +192,7 @@ class GlassBSDF : public BSDF {
 		 : transmittance(transmittance),
 		 reflectance(reflectance),
 		 roughness(roughness),
-		 ior(ior),
-		 mirrorBSDF(reflectance),
-		 refractionBSDF(transmittance, roughness, ior) {
+		 ior(ior){
 		 rasterize_color = transmittance;
 	 }
 
@@ -208,9 +206,6 @@ class GlassBSDF : public BSDF {
   float roughness;
   Spectrum reflectance;
   Spectrum transmittance;
-  RefractionBSDF refractionBSDF;
-  MirrorBSDF mirrorBSDF;
-
 };  // class GlassBSDF
 
 /**
