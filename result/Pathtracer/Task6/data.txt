@@ -2,10 +2,10 @@ CBcoil Task6
 SPP: 1024
 Number of samples per area light: 4
 Maximum ray depth: 4
-Threads: 4  |  Time: 339.6025ss
+Threads: 4  |  Time: 346.6408s
 
 CBdragon Task6
 SPP: 1024
 Number of samples per area light: 4
 Maximum ray depth: 4
-Threads: 4  |  Time: 319.9948s
+Threads: 4  |  Time: 331.1023s

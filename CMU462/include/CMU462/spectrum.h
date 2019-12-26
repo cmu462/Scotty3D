@@ -26,7 +26,7 @@ class Spectrum {
    * \param b Intensity of the blue spectrum
    */
   Spectrum(float r = 0, float g = 0, float b = 0) : r(r), g(g), b(b) {
-	  clampRGB();
+	  //clampRGB();
   }
 
   /**
@@ -46,7 +46,7 @@ class Spectrum {
     r += rhs.r;
     g += rhs.g;
     b += rhs.b;
-	clampRGB();
+	//clampRGB();
     return *this;
   }
 
@@ -58,7 +58,7 @@ class Spectrum {
     r *= rhs.r;
     g *= rhs.g;
     b *= rhs.b;
-	clampRGB();
+	//clampRGB();
     return *this;
   }
 
@@ -70,7 +70,7 @@ class Spectrum {
     r *= s;
     g *= s;
     b *= s;
-	clampRGB();
+	//clampRGB();
     return *this;
   }
 
@@ -95,10 +95,10 @@ class Spectrum {
   }
 
   // clamp the r,g,b values to be within 0 to 1
-  void clampRGB() {
-	  r = std::min(1.0f, std::max(0.0f, r));
-	  g = std::min(1.0f, std::max(0.0f, g));
-	  b = std::min(1.0f, std::max(0.0f, b));
+  void clampRGB(float upperlimit = 1.0f) {
+	  r = std::min(upperlimit, std::max(0.0f, r));
+	  g = std::min(upperlimit, std::max(0.0f, g));
+	  b = std::min(upperlimit, std::max(0.0f, b));
   }
 
 

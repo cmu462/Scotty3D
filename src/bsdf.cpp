@@ -52,15 +52,22 @@ Spectrum DiffuseBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 // Mirror BSDF //
 
 Spectrum MirrorBSDF::f(const Vector3D& wo, const Vector3D& wi) {
-	return Spectrum(1.0f, 1.0f, 1.0f);
+	Vector3D N(0, 0, 1);
+	Vector3D H = (wo + wi).unit();
+	return reflectance * pow(std::max(dot(N, H), 0.0), roughness);
+	//return Spectrum(1.0f, 1.0f, 1.0f);
 }
 
 Spectrum MirrorBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 	// TODO (PathTracer):
 	// Implement MirrorBSDF
+
 	reflect(wo, wi);
+	*pdf = 1.0f;
+	return reflectance * (1.0 / abs_cos_theta(*wi));
+	/*reflect(wo, wi);
 	*pdf = 1.0;
-	return f(wo, *wi);
+	return f(wo, *wi);*/
 }
 
 // Glossy BSDF //
@@ -79,17 +86,20 @@ Spectrum GlossyBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 // Refraction BSDF //
 
 Spectrum RefractionBSDF::f(const Vector3D& wo, const Vector3D& wi) {
-	return Spectrum(1.0f, 1.0f, 1.0f);
+	//return Spectrum(1.0f, 1.0f, 1.0f);
+	return Spectrum();
 }
 
 Spectrum RefractionBSDF::sample_f(const Vector3D& wo, Vector3D* wi,
 	float* pdf) {
 	// TODO (PathTracer):
 	// Implement RefractionBSDF
-	bool external = refract(wo, wi, ior);
+
+	/*bool external = refract(wo, wi, ior);
 	*pdf = 1.0;
 	if (external) return f(wo, *wi);
-	else return Spectrum();
+	else return Spectrum();*/
+	return Spectrum();
 }
 
 // Glass BSDF //
@@ -114,7 +124,6 @@ Spectrum GlassBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 
 	Vector3D wi_refract;
 	bool external = refract(wo, &wi_refract, ior);
-	//if (wo.z < 0)std::cout << wi_refract << std::endl;
 	if (external) cos_theta_t = abs(wi_refract.z);
 	else cos_theta_t = 0.0f;
 	cos_theta_i = abs(wo.z);
@@ -122,21 +131,26 @@ Spectrum GlassBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 	float r_parallel = (nt* cos_theta_i - ni * cos_theta_t) / (nt * cos_theta_i + ni * cos_theta_t);
 	float r_perpendicular = (ni* cos_theta_i - nt * cos_theta_t) / (ni * cos_theta_i + nt * cos_theta_t);
 	float Fr = 0.5f*(r_parallel*r_parallel + r_perpendicular * r_perpendicular);
+	Fr = std::min(1.0f, std::max(0.0f, Fr));
 	Fr = 0.0;
+
+	*pdf = 1.0;
 	// decide either reflect or refract based on it
 	if ((double(rand()) / RAND_MAX) < Fr) {
 		reflect(wo, wi);
-		*pdf = Fr;
+		//*pdf = Fr;
 		return Spectrum(1.0f, 1.0f, 1.0f);
 	}
 	else {
 		*wi = wi_refract;
-		*pdf = 1.0f - Fr;
+		//*pdf = 1.0f - Fr;
 		if (external) {
 			// use Distribution Function for Transmitted Light
-			float x = nt * nt / ni / ni * (1.0f - Fr) / abs(cos_theta_i);
-			//return Spectrum(x, x, x);
-			return Spectrum(1.0,1.0,1.0);
+			//float x = nt * nt / ni / ni * (1.0f - Fr) / abs(cos_theta_i);
+			float x = nt * nt / ni / ni * (1.0f - Fr);
+			//printf("%f\n", x);
+			return Spectrum(x, x, x)*transmittance;
+			//return Spectrum(1.0f, 1.0f, 1.0f);
 		}
 		else return Spectrum();
 	}
@@ -160,7 +174,13 @@ bool BSDF::refract(const Vector3D& wo, Vector3D* wi, float ior) {
 	float theta1 = acosf(abs(wo.z));
 	if (wo.z >= 0) sin_theta2 = 1.0f * sin(theta1) / ior;
 	else sin_theta2 = ior * sin(theta1) / 1.0f;
-	if (sin_theta2 > 1.0f) return false;
+	if (sin_theta2 > 1.0f) {
+		wi->x = -wo.x;
+		wi->y = -wo.y;
+		wi->z = 0;
+		wi->normalize();
+		return false;
+	}
 	else theta2 = asinf(sin_theta2);
 
 	wi->x = -wo.x;

@@ -549,7 +549,9 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
 			p = gridSampler->get_sample();
 			a1 = (double(x) + p.x) / w;
 			a2 = (double(y) + p.y) / h;
-			result += trace_ray(camera->generate_ray(a1 - 0.5, a2 - 0.5)) * (1.0 / num_samples);
+			temp = trace_ray(camera->generate_ray(a1 - 0.5, a2 - 0.5));
+			temp.clampRGB(1.0);
+			result += temp * (1.0 / num_samples);
 		}
 		return result;
 	}
