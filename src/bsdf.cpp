@@ -112,47 +112,42 @@ Spectrum GlassBSDF::f(const Vector3D& wo, const Vector3D& wi) {
 Spectrum GlassBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 	// TODO (PathTracer):
 	// Compute Fresnel coefficient.
-	float ni, nt, cos_theta_i, cos_theta_t;
-	if (wo.z >= 0) {
-		ni = 1.0;
-		nt = ior;
-	}
-	else {
-		ni = ior;
-		nt = 1.0;
-	}
-
 	Vector3D wi_refract;
 	bool external = refract(wo, &wi_refract, ior);
-	if (external) cos_theta_t = abs(wi_refract.z);
-	else cos_theta_t = 0.0f;
-	cos_theta_i = abs(wo.z);
+	if (external) {
+		float ni, nt, cos_theta_i, cos_theta_t;
+		if (wo.z >= 0) {
+			ni = 1.0;
+			nt = ior;
+		}
+		else {
+			ni = ior;
+			nt = 1.0;
+		}
+		cos_theta_t = abs(wi_refract.z);
+		cos_theta_i = abs(wo.z);
+		float r_parallel = (nt* cos_theta_i - ni * cos_theta_t) / (nt * cos_theta_i + ni * cos_theta_t);
+		float r_perpendicular = (ni* cos_theta_i - nt * cos_theta_t) / (ni * cos_theta_i + nt * cos_theta_t);
+		float Fr = 0.5f*(r_parallel*r_parallel + r_perpendicular * r_perpendicular);
+		Fr = std::min(1.0f, std::max(0.0f, Fr));
+		//Fr = 0.0;
 
-	float r_parallel = (nt* cos_theta_i - ni * cos_theta_t) / (nt * cos_theta_i + ni * cos_theta_t);
-	float r_perpendicular = (ni* cos_theta_i - nt * cos_theta_t) / (ni * cos_theta_i + nt * cos_theta_t);
-	float Fr = 0.5f*(r_parallel*r_parallel + r_perpendicular * r_perpendicular);
-	Fr = std::min(1.0f, std::max(0.0f, Fr));
-	Fr = 0.0;
-
-	*pdf = 1.0;
-	// decide either reflect or refract based on it
-	if ((double(rand()) / RAND_MAX) < Fr) {
-		reflect(wo, wi);
-		//*pdf = Fr;
-		return Spectrum(1.0f, 1.0f, 1.0f);
+		// decide either reflect or refract based on it
+		if ((double(rand()) / RAND_MAX) < Fr) {
+			reflect(wo, wi);
+			*pdf = Fr;
+			return Fr * reflectance * (1.0 / abs_cos_theta(*wi));
+		}
+		else {
+			*wi = wi_refract;
+			*pdf = 1.0f - Fr;
+			return transmittance * (nt * nt / ni / ni / cos_theta_i) * (1.0f - Fr);
+		}
 	}
 	else {
-		*wi = wi_refract;
-		//*pdf = 1.0f - Fr;
-		if (external) {
-			// use Distribution Function for Transmitted Light
-			//float x = nt * nt / ni / ni * (1.0f - Fr) / abs(cos_theta_i);
-			float x = nt * nt / ni / ni * (1.0f - Fr);
-			//printf("%f\n", x);
-			return Spectrum(x, x, x)*transmittance;
-			//return Spectrum(1.0f, 1.0f, 1.0f);
-		}
-		else return Spectrum();
+		reflect(wo, wi);
+		*pdf = 1.0f;
+		return reflectance * (1.0 / abs_cos_theta(*wi));
 	}
 }
 
