@@ -9,3 +9,15 @@ SPP: 1024
 Number of samples per area light: 4
 Maximum ray depth: 4
 Threads: 4  |  Time: 331.1023s
+
+CBsphere Task6
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 202.4509s
+
+CBsphere Task6
+SPP: 4096
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 754.0122s

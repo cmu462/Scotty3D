@@ -550,8 +550,7 @@ Spectrum PathTracer::raytrace_pixel(size_t x, size_t y) {
 			a1 = (double(x) + p.x) / w;
 			a2 = (double(y) + p.y) / h;
 			temp = trace_ray(camera->generate_ray(a1 - 0.5, a2 - 0.5));
-			cout << temp << endl;
-			//temp.clampRGB(1.0);
+			temp.clampRGB(10.0);
 			result += temp * (1.0 / num_samples);
 		}
 		return result;
