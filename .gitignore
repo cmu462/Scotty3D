@@ -7,3 +7,4 @@ build_debug
 .idea/
 cmake-build-debug/
 Buffer scense location.lnk
+envMaps
