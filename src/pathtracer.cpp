@@ -510,7 +510,7 @@ Spectrum PathTracer::trace_ray(const Ray &r) {
 	Vector3D new_o = hit_p + EPS_D * wi_world;
 	Ray new_ray(new_o, wi_world);
 	new_ray.depth = r.depth + 1;
-	double cos_theta = wi.z;
+	double cos_theta = abs(wi.z);
 
 	/*Vector3D in = (hit_p - r.o).unit();
 	cout << "In: " << in << "  Out: " << wi_world << endl;*/
