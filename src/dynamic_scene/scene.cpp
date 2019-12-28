@@ -454,10 +454,15 @@ void Scene::downsample_selected_mesh() {
 }
 
 void Scene::resample_selected_mesh() {
-  if (selected.object == nullptr || selected.element == nullptr) return;
+  /*if (selected.object == nullptr || selected.element == nullptr) return;
   Mesh *m = dynamic_cast<Mesh *>(selected.object);
   if (m) m->resample();
-  clearSelections();
+  clearSelections();*/
+
+  for (auto x : objects) {
+	  Mesh *m = dynamic_cast<Mesh *>(x);
+	  if (m) m->resample();
+  }
 }
 
 StaticScene::Scene *Scene::get_static_scene() {

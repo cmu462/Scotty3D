@@ -996,6 +996,25 @@ void MeshResampler::downsample(HalfedgeMesh& mesh) {
 void MeshResampler::resample(HalfedgeMesh& mesh) {
 	// TODO: (meshEdit)
 	// Compute the mean edge length.
+
+	/* this part of the code is for resizing the mesh*/
+	double temp;
+	for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+		temp = v->position.x;
+		v->position.x = v->position.y;
+		v->position.y = -temp;
+
+		temp = v->position.y;
+		v->position.y = v->position.z;
+		v->position.z = -temp;
+
+		v->position.x *= -1;
+		v->position.z *= -1;
+	}
+	return;
+	/* end of the code for resizing the mesh*/
+
+	
 	double L = 0.0;
 	for (EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++) {
 		L += e->length();
