@@ -3,10 +3,60 @@
 namespace CMU462 {
 namespace StaticScene {
 
-EnvironmentLight::EnvironmentLight(const HDRImageBuffer* envMap)
-    : envMap(envMap) {
-  // TODO: (PathTracer) initialize things here as needed
-}
+	EnvironmentLight::EnvironmentLight(const HDRImageBuffer* envMap)
+		: envMap(envMap) {
+		// TODO: (PathTracer) initialize things here as needed
+
+		// compute the weight of each pixel and store it in a vector
+		double theta, d_theta = PI / envMap->h;
+		float L;
+		std::vector<float> weight(envMap->w * envMap->h); 
+		for (int h = 0; h < envMap->h; h++) {
+			for (int w = 0; w < envMap->w; w++) {
+				// When computing areas corresponding to a pixel,
+				// use the value of theta at the pixel centers
+				theta = (h + 0.5)*d_theta;
+				L = envMap->data[h * envMap->w + w].illum();
+				weight[h * envMap->w + w] = L * sinf(theta);
+			}
+		}
+
+		// find total weight 
+		float total_row_weight, total_weight = 0.0;
+		for (auto x : weight) total_weight += x;
+
+		// normalize the weight and store the PDF
+		pdf_of_rows.resize(envMap->h);
+		pdf_in_each_row.resize(envMap->h);
+		for (int h = 0; h < envMap->h; h++) {
+			pdf_in_each_row[h].resize(envMap->w);
+			total_row_weight = 0.0;
+			for (int w = 0; w < envMap->w; w++) {
+				total_row_weight += weight[h * envMap->w + w];
+			}
+			pdf_of_rows[h] = total_row_weight / total_weight;
+			for (int w = 0; w < envMap->w; w++) {
+				pdf_in_each_row[h][w] = weight[h * envMap->w + w] / total_row_weight;
+			}
+		}
+
+		// calculate CDF based on PDF
+		float total_row_pdf, total_pdf = 0.0;
+		cdf_of_rows.resize(envMap->h);
+		cdf_in_each_row.resize(envMap->h);
+		for (int h = 0; h < envMap->h; h++) {
+			cdf_in_each_row[h].resize(envMap->w);
+
+			total_pdf += pdf_of_rows[h];
+			cdf_of_rows[h] = total_pdf;
+
+			total_row_pdf = 0.0;
+			for (int w = 0; w < envMap->w; w++) {
+				total_row_pdf += pdf_in_each_row[h][w];
+				cdf_in_each_row[h][w] = total_row_pdf;
+			}
+		}
+	}
 
 Spectrum EnvironmentLight::sample_L(const Vector3D& p, Vector3D* wi,
 	float* distToLight, float* pdf) const {

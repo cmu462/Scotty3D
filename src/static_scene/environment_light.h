@@ -45,6 +45,12 @@ class EnvironmentLight : public SceneLight {
 
  private:
   const HDRImageBuffer* envMap;
+  // probability distribution
+  std::vector<float> pdf_of_rows;
+  std::vector<std::vector<float>> pdf_in_each_row;
+  // cumulative probability distribution
+  std::vector<float> cdf_of_rows;
+  std::vector<std::vector<float>> cdf_in_each_row;
 };  // class EnvironmentLight
 
 }  // namespace StaticScene
