@@ -999,17 +999,15 @@ void MeshResampler::resample(HalfedgeMesh& mesh) {
 
 	/* this part of the code is for resizing the mesh*/
 	double temp;
+	double theta = -PI / 6;
+	double newx, newz;
+	double offsetz = 0.0;
+	double offsetx = 0.43;
 	for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
-		temp = v->position.x;
-		v->position.x = v->position.y;
-		v->position.y = -temp;
-
-		temp = v->position.y;
-		v->position.y = v->position.z;
-		v->position.z = -temp;
-
-		v->position.x *= -1;
-		v->position.z *= -1;
+		newx = (v->position.x - offsetx) * cos(theta) - (v->position.z- offsetz) * sin(theta);
+		newz = (v->position.x - offsetx) * sin(theta) + (v->position.z- offsetz) * cos(theta);
+		v->position.x = newx + offsetx;
+		v->position.z = newz+ offsetz;
 	}
 	return;
 	/* end of the code for resizing the mesh*/
