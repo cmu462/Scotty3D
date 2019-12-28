@@ -1,0 +1,17 @@
+sphere_diffuse in ennis with uniform sampling
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 174.5963s
+
+sphere_diffuse in field with uniform sampling
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 173.6375s
+
+sphere_diffuse in grace with uniform sampling
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 171.6582ss

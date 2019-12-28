@@ -9,9 +9,29 @@ EnvironmentLight::EnvironmentLight(const HDRImageBuffer* envMap)
 }
 
 Spectrum EnvironmentLight::sample_L(const Vector3D& p, Vector3D* wi,
-                                    float* distToLight, float* pdf) const {
-  // TODO: (PathTracer) Implement
-  return Spectrum(0, 0, 0);
+	float* distToLight, float* pdf) const {
+	// TODO: (PathTracer) Implement
+
+	// uniform sampling in the enitre sphere
+	// by first sampling in hemisphere
+	// then decide whether to flip the z coodinate
+	double Xi1 = (double)(std::rand()) / RAND_MAX;
+	double Xi2 = (double)(std::rand()) / RAND_MAX;
+
+	double theta = acos(Xi1);
+	double phi = 2.0 * PI * Xi2;
+
+	double xs = sinf(theta) * cosf(phi);
+	double ys = sinf(theta) * sinf(phi);
+	double zs = cosf(theta);
+
+	if ((double)(std::rand()) / RAND_MAX < 0.5) zs *= -1;
+	Vector3D d = (xs, ys, zs);
+	Ray r(p,d);
+
+	*pdf = 1.0 / 4 / PI;
+	*distToLight = INF_D;
+	return sample_dir(r);
 }
 
 Spectrum EnvironmentLight::sample_dir(const Ray& r) const {
