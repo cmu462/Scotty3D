@@ -49,14 +49,12 @@ namespace StaticScene {
 
 			total_pdf += pdf_of_rows[h];
 			cdf_of_rows[h] = total_pdf;
-			//printf("%f,", cdf_of_rows[h]);
 			total_row_pdf = 0.0;
 			for (int w = 0; w < envMap->w; w++) {
 				total_row_pdf += pdf_in_each_row[h][w];
 				cdf_in_each_row[h][w] = total_row_pdf;
 			}
 		}
-		//printf("\n");
 	}
 
 	/**
@@ -86,7 +84,7 @@ Spectrum EnvironmentLight::sample_L(const Vector3D& p, Vector3D* wi,
 	/* by first sampling in hemisphere
 	/* then decide whether to flip the z coodinate
 	**********************************************/
-	double Xi1 = (double)(std::rand()) / RAND_MAX;
+	/*double Xi1 = (double)(std::rand()) / RAND_MAX;
 	double Xi2 = (double)(std::rand()) / RAND_MAX;
 
 	double theta = acos(Xi1);
@@ -102,38 +100,36 @@ Spectrum EnvironmentLight::sample_L(const Vector3D& p, Vector3D* wi,
 
 	*pdf = 1.0 / 4 / PI;
 	*distToLight = INF_D;
-	return sample_dir(r);
+	return sample_dir(r);*/
 
 
 	/************************************************
 	/* importance sampling using the inversion method
 	*************************************************/
 	// first select a "row" of the environment map according
-	//int row = my_binary_search(cdf_of_rows, (double)(std::rand()) / RAND_MAX);
-	////printf("(%d,", row);
-	//double pdf_row = pdf_of_rows[row];
-	//int col = my_binary_search(cdf_in_each_row[row], (double)(std::rand()) / RAND_MAX);
-	//double pdf_col = pdf_in_each_row[row][col];
+	int row = my_binary_search(cdf_of_rows, (double)(std::rand()) / RAND_MAX);
+	double pdf_row = pdf_of_rows[row];
+	int col = my_binary_search(cdf_in_each_row[row], (double)(std::rand()) / RAND_MAX);
+	double pdf_col = pdf_in_each_row[row][col];
 
-	//double theta = PI / (row+0.5) * envMap->h;
-	//double phi = 2.0 * PI / (col+0.5) * envMap->w;
-	//*wi = (sin(theta)*cos(phi), sin(theta)*sin(phi), cos(theta));
+	double theta = PI / (row+0.5) * envMap->h;
+	double phi = 2.0 * PI / (col+0.5) * envMap->w;
+	*wi = (sin(theta)*cos(phi), sin(theta)*sin(phi), cos(theta));
 
-	//// The pdfs were the relative share out of the individual pixels. 
-	//// However the pixel size could vary a lot, we want the relative 
-	//// share of the sphere surface area integral (4 PI). So I needed 
-	//// to multiply in the number of pixels and divide out 4*PI.
-	//*pdf = pdf_row * envMap->h * pdf_col * envMap->w / 4.0 / PI;
-	//*distToLight = INF_D;
-	////printf("%f)", *pdf);
-	//return envMap->data[row*envMap->w + col];
+	// The pdfs were the relative share out of the individual pixels. 
+	// However the pixel size could vary a lot, we want the relative 
+	// share of the sphere surface area integral (4 PI). So I needed 
+	// to multiply in the number of pixels and divide out 4*PI.
+	*pdf = pdf_row * envMap->h * pdf_col * envMap->w / 4.0 / PI;
+	*distToLight = INF_D;
+	return envMap->data[row*envMap->w + col];
 }
 
 Spectrum EnvironmentLight::sample_dir(const Ray& r) const {
 	// TODO: (PathTracer) Implement
 	// in meshedit mode the green (y) axis is oriented vertically, not z
 	double theta = acos(r.d.y); 
-	double phi = atan2(r.d.x, r.d.z);
+	double phi = -atan2(r.d.x, r.d.z);
 	if (phi < 0) phi += 2 * PI;
 	double x = phi / (2 * PI) * envMap->w;
 	double y = theta / PI * envMap->h;

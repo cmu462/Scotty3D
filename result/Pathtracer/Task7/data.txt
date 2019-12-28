@@ -15,3 +15,27 @@ SPP: 1024
 Number of samples per area light: 4
 Maximum ray depth: 4
 Threads: 4  |  Time: 171.6582ss
+
+bunny in grace with uniform sampling
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 505.3802s
+
+bunny in grace with importance sampling
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 506.8s
+
+bunny in field with uniform sampling
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 490.219s
+
+bunny in field with importance sampling
+SPP: 1024
+Number of samples per area light: 4
+Maximum ray depth: 4
+Threads: 4  |  Time: 548.820s
