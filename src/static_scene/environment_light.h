@@ -44,13 +44,23 @@ class EnvironmentLight : public SceneLight {
   Spectrum sample_dir(const Ray& r) const;
 
  private:
+
+	/**
+	* given a sorted vector of cumulative distribution and a key,
+	* return the index in that vector that has the smallest value 
+	* that is equal to or larger than the key.
+	* Assumption: vector is sorted from 0 to 1
+	* key ranges from 0 to 1
+	*/
+	int my_binary_search(const std::vector<double> &v, double key)const;
+
   const HDRImageBuffer* envMap;
   // probability distribution
-  std::vector<float> pdf_of_rows;
-  std::vector<std::vector<float>> pdf_in_each_row;
+  std::vector<double> pdf_of_rows;
+  std::vector<std::vector<double>> pdf_in_each_row;
   // cumulative probability distribution
-  std::vector<float> cdf_of_rows;
-  std::vector<std::vector<float>> cdf_in_each_row;
+  std::vector<double> cdf_of_rows;
+  std::vector<std::vector<double>> cdf_in_each_row;
 };  // class EnvironmentLight
 
 }  // namespace StaticScene
