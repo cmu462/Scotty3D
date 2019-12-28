@@ -111,7 +111,6 @@ Spectrum GlassBSDF::f(const Vector3D& wo, const Vector3D& wi) {
 
 Spectrum GlassBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 	// TODO (PathTracer):
-	// Compute Fresnel coefficient.
 	Vector3D wi_refract;
 	bool external = refract(wo, &wi_refract, ior);
 	if (external) {
@@ -126,11 +125,12 @@ Spectrum GlassBSDF::sample_f(const Vector3D& wo, Vector3D* wi, float* pdf) {
 		}
 		cos_theta_t = abs(wi_refract.z);
 		cos_theta_i = abs(wo.z);
+
+		// Compute Fresnel coefficient.
 		float r_parallel = (nt* cos_theta_i - ni * cos_theta_t) / (nt * cos_theta_i + ni * cos_theta_t);
 		float r_perpendicular = (ni* cos_theta_i - nt * cos_theta_t) / (ni * cos_theta_i + nt * cos_theta_t);
 		float Fr = 0.5f*(r_parallel*r_parallel + r_perpendicular * r_perpendicular);
 		Fr = std::min(1.0f, std::max(0.0f, Fr));
-		//Fr = 0.0;
 
 		// decide either reflect or refract based on it
 		if ((double(rand()) / RAND_MAX) < Fr) {

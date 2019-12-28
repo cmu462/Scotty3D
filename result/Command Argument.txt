@@ -3,6 +3,9 @@
 ../../media/pathtracer/advanced/bunny.dae
 ../../media/pathtracer/basic/sphere_glass.dae
 
--t 8 -s 1024 ../../media/pathtracer/basic/carim_diffuse.dae
+-m 4 ../../media/pathtracer/basic/carim_diffuse.dae
 -t 4 -s 1024 -w C:/Users/wangx/Desktop/test.png ../../media/pathtracer/basic/sphere7_diffuse.dae
 -s 1024 -m 4 -t 4 -w C:/Users/wangx/Desktop/test.png ../../media/pathtracer/advanced/CBspheres_lambertian.dae
+
+-m 4 -e ../../envMaps/grace.exr ../../media/pathtracer/basic/sphere_glass.dae
+-s 1024 -m 4 -t 4 -w C:/Users/wangx/Desktop/test.png -e ../../envMaps/grace.exr ../../media/pathtracer/basic/sphere_glass.dae
