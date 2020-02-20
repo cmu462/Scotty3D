@@ -885,10 +885,10 @@ void HalfedgeMesh::checkConsistency() const {
 		}
 	}
 
-	// Check whether each halfedge's twin halfedge points to itself
+	// Check whether each halfedge's twin's twin points to itself
 	for (HalfedgeCIter h = halfedgesBegin(); h != halfedgesEnd(); h++) {
 		if (h->twin()->twin() != h) {
-			cerr << "halfedge's twin halfedge does not point to itself!" << endl;
+			cerr << "halfedge's twin's twin does not point to itself!" << endl;
 			exit(1);
 		}
 	}
