@@ -1039,7 +1039,7 @@ class HalfedgeMesh {
   /**
   * Performs consistency checks of mesh iterators. In particular, checks whether:
   * - Each halfedge's twin does not point to itself
-  * - Each halfedge's twin halfedge points to itself
+  * - Each halfedge's twin's twin points to itself
   * - Each halfedge's next points to a unique halfedge
   * - Each halfedge incident on a vertex points to that vertex
   * - Each halfedge incident on an edge points to that edge
