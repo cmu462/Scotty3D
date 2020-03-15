@@ -29,50 +29,45 @@ set(CMU462_INCLUDE_DIRS "${CMU462_SOURCE_DIR}/include")
 ###################
 if(APPLE)
 
-  # Clang only
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "CLANG")
+  # OSX Framework dependencies
+  if(NOT CMU462_BUILD_SHARED)
+    include_directories( "/System/Library/Frameworks" )
+    find_library (COCOA_LIBRARIES Cocoa)
+    find_library (IOKIT_LIBRARIES IOkit)
+    find_library (COREVIDEO_LIBRARIES CoreVideo)
+  endif()
 
-    # OSX Framework dependencies
-    if(NOT CMU462_BUILD_SHARED)
-      include_directories( "/System/Library/Frameworks" )
-      find_library (COCOA_LIBRARIES Cocoa)
-      find_library (IOKIT_LIBRARIES IOkit)
-      find_library (COREVIDEO_LIBRARIES CoreVideo)
-    endif()
+  # Clang configuration
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
-    # Clang configuration
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+    set(CLANG_CXX_FLAGS "-std=c++11 -m64")
 
-      set(CLANG_CXX_FLAGS "-std=c++11 -m64")
+    if(CMU462_BUILD_DEBUG)
+      set(CMAKE_BUILD_TYPE Debug)
+    else(CMU462_BUILD_DEBUG)
+      set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -O3")
+      set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -funroll-loops")
+      set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -Wno-narrowing")
+      set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -Wno-deprecated-register")
+    endif(CMU462_BUILD_DEBUG)
 
-      if(CMU462_BUILD_DEBUG)
-        set(CMAKE_BUILD_TYPE Debug)
-      else(CMU462_BUILD_DEBUG)
-        set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -O3")
-        set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -funroll-loops")
-        set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -Wno-narrowing")
-        set(CLANG_CXX_FLAGS "${CLANG_CXX_FLAGS} -Wno-deprecated-register")
-      endif(CMU462_BUILD_DEBUG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
 
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
+  endif()
 
-    endif()
+  # GCC configuration
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
-    # GCC configuration
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(GCC_CXX_FLAGS "-std=gnu++11 -m64")
 
-      set(GCC_CXX_FLAGS "-std=gnu++11 -m64")
+    if(CMU462_BUILD_DEBUG)
+      set(CMAKE_BUILD_TYPE Debug)
+    else(CMU462_BUILD_DEBUG)
+      set(GCC_CXX_FLAGS "${GCC_CXX_FLAGS} -O3")
+      set(GCC_CXX_FLAGS "${GCC_CXX_FLAGS} -fopenmp")
+    endif(CMU462_BUILD_DEBUG)
 
-      if(CMU462_BUILD_DEBUG)
-        set(CMAKE_BUILD_TYPE Debug)
-      else(CMU462_BUILD_DEBUG)
-        set(GCC_CXX_FLAGS "${GCC_CXX_FLAGS} -O3")
-        set(GCC_CXX_FLAGS "${GCC_CXX_FLAGS} -fopenmp")
-      endif(CMU462_BUILD_DEBUG)
-
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_CXX_FLAGS}")
-
-    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_CXX_FLAGS}")
 
   endif()
 
