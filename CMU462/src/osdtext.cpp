@@ -353,8 +353,8 @@ GLuint OSDText::compile_shaders() {
     printf("%s\n", &program_errmsg[0]);
   }
 
-  glDetachShader(1, vert_shader);
-  glDetachShader(1, frag_shader);
+  glDetachShader(program, vert_shader);
+  glDetachShader(program, frag_shader);
   glDeleteShader(vert_shader);
   glDeleteShader(frag_shader);
 

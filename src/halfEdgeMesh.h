@@ -1036,6 +1036,19 @@ class HalfedgeMesh {
   void splitPolygon(FaceIter f);
   void splitPolygons(vector<FaceIter>& fcs);
 
+  /**
+  * Performs consistency checks of mesh iterators. In particular, checks whether:
+  * - Each halfedge's twin does not point to itself
+  * - Each halfedge's twin's twin points to itself
+  * - Each halfedge's next points to a unique halfedge
+  * - Each halfedge incident on a vertex points to that vertex
+  * - Each halfedge incident on an edge points to that edge
+  * - Each halfedge incident on a face points to that face
+  * - Each halfedge incident on a boundary loop points to that boundary loop
+  * Prints an error message to the command line and terminates program if any these checks fail.
+  */
+  void checkConsistency() const;
+
  protected:
   /*
    * Here's where the mesh elements are actually stored---this is the one

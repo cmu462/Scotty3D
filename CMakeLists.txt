@@ -25,6 +25,9 @@ if(APPLE)
     find_library (COREVIDEO_LIBRARIES CoreVideo)
   endif()
 
+  include_directories(/usr/local/include)
+  link_directories(/usr/local/lib)
+
   # Clang configuration
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 

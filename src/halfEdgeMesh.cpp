@@ -876,4 +876,88 @@ Info Halfedge::getInfo() {
   return info;
 }
 
+void HalfedgeMesh::checkConsistency() const {
+	// Check whether each halfedge's twin does not point to itself
+	for (HalfedgeCIter h = halfedgesBegin(); h != halfedgesEnd(); h++) {
+		if (h->twin() == h) {
+			cerr << "halfedge's twin points to itself!" << endl;
+			exit(1);
+		}
+	}
+
+	// Check whether each halfedge's twin's twin points to itself
+	for (HalfedgeCIter h = halfedgesBegin(); h != halfedgesEnd(); h++) {
+		if (h->twin()->twin() != h) {
+			cerr << "halfedge's twin's twin does not point to itself!" << endl;
+			exit(1);
+		}
+	}
+
+	// Check whether each halfedge's next points to a unique halfedge
+	map<HalfedgeCIter, bool> halfedgeCounter;
+	for (HalfedgeCIter h = halfedgesBegin(); h != halfedgesEnd(); h++) {
+		if (halfedgeCounter.find(h->next()) == halfedgeCounter.end()) {
+			halfedgeCounter[h->next()] = true;
+
+		} else {
+			cerr << "halfedge is pointed to by more than one halfedge's next!" << endl;
+			exit(1);
+		}
+	}
+
+	// Check whether each halfedge incident on a vertex points to that vertex
+	for (VertexCIter v = verticesBegin(); v != verticesEnd(); v++) {
+		HalfedgeCIter h = v->halfedge();
+		do {
+			if (h->vertex() != v) {
+				cerr << "halfedge incident on vertex does not point to that vertex!" << endl;
+				exit(1);
+			}
+
+			h = h->twin()->next();
+		} while (h != v->halfedge());
+	}
+
+	// Check whether each halfedge incident on an edge points to that edge
+	for (EdgeCIter e = edgesBegin(); e != edgesEnd(); e++) {
+		HalfedgeCIter h = e->halfedge();
+		do {
+			if (h->edge() != e) {
+				cerr << "halfedge incident on edge does not point to that edge!" << endl;
+				exit(1);
+			}
+
+			h = h->twin();
+		} while (h != e->halfedge());
+	}
+
+	// Check whether each halfedge incident on a face points to that face
+	for (FaceCIter f = facesBegin(); f != facesEnd(); f++) {
+		HalfedgeCIter h = f->halfedge();
+		do {
+			if (h->face() != f) {
+				cerr << "halfedge incident on face does not point to that face!" << endl;
+				exit(1);
+			}
+
+			h = h->next();
+		} while (h != f->halfedge());
+	}
+
+	// Check whether each halfedge incident on a boundary loop points to that boundary loop
+	for (FaceCIter b = boundariesBegin(); b != boundariesEnd(); b++) {
+		HalfedgeCIter h = b->halfedge();
+		do {
+			if (h->face() != b) {
+				cerr << "halfedge incident on boundary loop does not point to that boundary loop!" << endl;
+				exit(1);
+			}
+
+			h = h->next();
+		} while (h != b->halfedge());
+	}
+
+	cout << "All consistency checks passed" << endl;
+}
+
 }  // namespace CMU462
