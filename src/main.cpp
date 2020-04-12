@@ -8,6 +8,8 @@
 #include "image.h"
 
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #ifndef gid_t
 typedef unsigned int gid_t;  // XXX Needed on some platforms, since gid_t is
@@ -31,6 +33,8 @@ void usage(const char* binaryName) {
   printf("  -m  <INT>        Maximum ray depth\n");
   printf("  -e  <PATH>       Path to environment map\n");
   printf("  -w  <PATH>       Run Pathtracer without GUI, save render to PATH\n");
+  printf("  -d  <w>x<h>      Width and height of output when pathtracing without GUI.\n");
+  printf("                   Given via two integers with an x between them (e.g 800x600).\n");
   printf("  -h               Print this help message\n");
   printf("\n");
 }
@@ -75,7 +79,7 @@ int main(int argc, char** argv) {
   // get the options
   AppConfig config;
   int opt;
-  while ((opt = getopt(argc, argv, "s:l:t:m:e:w:h")) !=
+  while ((opt = getopt(argc, argv, "s:l:t:m:e:w:d:h")) !=
          -1) {  // for each option...
     switch (opt) {
       case 's':
@@ -96,6 +100,19 @@ int main(int argc, char** argv) {
       case 'w':
         if(optarg != nullptr) {
           config.pathtracer_result_path = optarg;
+        }
+        break;
+      case 'd':
+        if (optarg != nullptr) {
+            std::string wh = optarg;
+            std::stringstream ss(wh);
+            std::string tok;
+            if (std::getline(ss, tok, 'x'))
+                config.pathtracer_result_width = std::stoi(tok);
+            if (std::getline(ss, tok))
+                config.pathtracer_result_height = std::stoi(tok);
+            else
+                config.pathtracer_result_height = config.pathtracer_result_width * 3 / 4;
         }
         break;
       default:
@@ -121,11 +138,29 @@ int main(int argc, char** argv) {
     exit(0);
   }
 
-  // create viewer
-  Viewer viewer = Viewer();
+  const bool headless = config.pathtracer_result_path != "";
 
   // create application
   Application app(config);
+
+  app.init_headless = headless;
+
+  if(headless) {
+      // Initialize the application headless (without OpenGL context)
+      // A Viewer() spins up an OpenGL context, so we have to call
+      // Application::init() manually (normally, the Viewer calls init()).
+      app.init();
+
+      // load scene
+      app.load(sceneInfo);
+
+      // Now render the scene in headless mode and exit.
+      app.render_scene(config.pathtracer_result_path);
+      exit(EXIT_SUCCESS);
+  }
+
+  // create viewer
+  Viewer viewer = Viewer();
 
   // set renderer
   viewer.set_renderer(&app);
@@ -140,12 +175,6 @@ int main(int argc, char** argv) {
 
   // NOTE (sky): are we copying everything to dynamic scene? If so:
   // TODO (sky): check and make sure the destructor is freeing everything
-
-  // Run in terminal mode if requested
-  if(config.pathtracer_result_path != "") {
-    app.render_scene(config.pathtracer_result_path);
-    exit(EXIT_SUCCESS);
-  }
 
   // start viewer
   viewer.start();

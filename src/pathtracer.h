@@ -142,9 +142,18 @@ class PathTracer {
   void save_image(string filename);
 
   /**
-   * Wait for the scene to finish raytracing.
+   * Wait for the scene to finish raytracing.  Additionally calls
+   * update_screen to update the screen with the current output.
    */
   bool is_done();
+
+  /**
+   * Same as is_done, but does not make a call to update_screen.
+   * Used in headless mode when there is no OpenGL context.
+   */
+  bool is_done_headless() {
+      return state == DONE;
+  }
 
  private:
   /**
